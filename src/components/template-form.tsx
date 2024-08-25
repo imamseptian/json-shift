@@ -78,7 +78,7 @@ export default function TemplateForm(
           <div>
             <span className="font-medium">Warning alert!</span>
             { ' ' }
-            This website is still in development and may experience some limitations. Please note the following:
+            Due to LLM Token limitations per request that can cause a slow process or even an error response, Please note the following :
             <ul className="list-disc list-outside mt-3">
               <li>
                 <b>Processing Time:</b>
