@@ -1,4 +1,3 @@
-import { env } from "@/lib/env";
 import { rateLimiter } from "hono-rate-limiter";
 
 export const limiterMiddleware = rateLimiter({
@@ -11,7 +10,7 @@ export const limiterMiddleware = rateLimiter({
   //   const info = getConnInfo(c);
   //   return info.remote.address || "unknown";
   // },
-  skip            : () => env.NODE_ENV === "development",
+  skip            : () => process.env.NODE_ENV === "development",
   handler         : (c) => c.json(
     {
       code    : "TOO_MANY_REQUESTS",
