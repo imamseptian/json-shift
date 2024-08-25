@@ -403,3 +403,7 @@ bun dev
 - LLM: Gemini, Groq
 - Vector Store: Upstash
 - Development: TypeScript, Bun
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
