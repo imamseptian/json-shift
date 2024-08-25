@@ -1,9 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { v4 as uuid } from "uuid";
+import { useEffect } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,17 +17,10 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 
-import { applyValidationErrorsToForm } from "@/lib/error-utils";
 import { Template, TemplateSchema } from "@/schemas/template-schema";
-import { useModelStore } from "@/store/model-store";
-import { useTemplateStore } from "@/store/template-store";
-import { ExecutionTime, ExecutionTimeResult } from "./execution-time-result";
 
 import AttributeFields from "./attribute-fields";
-import BrowseTemplate from "./browse-template";
 import InputField from "./input-field";
-import JsonResultView from "./json-result-view";
-import { Skeleton } from "./skeleton";
 import { Checkbox } from "./ui/checkbox";
 
 const DEFAULT_TEMPLATE_VALUES: Template = {
@@ -38,29 +30,15 @@ const DEFAULT_TEMPLATE_VALUES: Template = {
   ignoreCache : false,
 };
 
-interface ErrorObject {
-  title: string;
-  message: string;
-}
-
-export default function TemplateForm() {
-  const {
-    selectedTemplate,
-    setSelectedTemplate,
-    addTemplate,
-    updateTemplate,
-  } = useTemplateStore();
-  const { model: selectedModel } = useModelStore();
-
-  const resultRef                         = useRef<HTMLDivElement>(null);
-  const [objectResult, setObjectResult]   = useState<any>(null);
-  const [errorObject, setErrorObject]     = useState<ErrorObject | null>(null);
-  const [executionTime, setExecutionTime] = useState<ExecutionTime>({
-    scrapeExecutionTime : null,
-    embeddingTime       : null,
-    llmProcessingTime   : null,
-  });
-
+export default function TemplateForm(
+  {
+    template,
+    onFormSubmit,
+  }: {
+    template: Template | null | undefined,
+    onFormSubmit: (data: Template, form: UseFormReturn<Template>) => void
+  },
+) {
   const form = useForm<Template>({
     resolver      : zodResolver(TemplateSchema),
     defaultValues : DEFAULT_TEMPLATE_VALUES,
@@ -74,133 +52,31 @@ export default function TemplateForm() {
   } = form;
 
   useEffect(() => {
-    if (selectedTemplate) {
-      reset(selectedTemplate);
-      setObjectResult(selectedTemplate.latestResult);
+    if (template) {
+      reset(template);
     } else {
-      setObjectResult(null);
       reset(DEFAULT_TEMPLATE_VALUES);
     }
-  }, [selectedTemplate, reset]);
+  }, [template, reset]);
 
   const onSubmit = async (values: Template) => {
-    if (resultRef.current) {
-      resultRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-
-    let templateUuid = values.id;
-    if (!templateUuid) {
-      templateUuid = uuid();
-    }
-
-    setErrorObject(null);
-    setObjectResult(null);
-
-    try {
-      const response = await fetch("/api/extract", {
-        method  : "POST",
-        headers : { "Content-Type": "application/json" },
-        body    : JSON.stringify({
-          ...values,
-          model : selectedModel,
-          id    : templateUuid,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 422 && data.code === "VALIDATION_ERROR") {
-          // Handle Zod validation error
-          applyValidationErrorsToForm(data.details, form.setError);
-          setErrorObject({
-            title: data?.title ?? "Validation Error",
-            message:
-              data?.message ?? "Validation failed. Please check your inputs.",
-          });
-        } else {
-          setErrorObject({
-            title   : data?.title ?? "Unknown error",
-            message : data?.message ?? "Unknown error",
-          });
-        }
-      } else {
-        setObjectResult(data.answer);
-      }
-
-      if (response.ok) {
-        if (values.id) {
-          const updatedTemplate = {
-            ...values,
-            latestResult: data?.answer ?? null,
-          };
-          updateTemplate(updatedTemplate);
-        } else {
-          const newTemplate = {
-            ...values,
-            latestResult : data?.answer ?? null,
-            id           : templateUuid,
-          };
-          addTemplate(newTemplate);
-          setSelectedTemplate(newTemplate);
-        }
-      }
-
-      setExecutionTime({
-        scrapeExecutionTime : data?.scrapeExecutionTime ?? null,
-        embeddingTime       : data?.embeddingTime ?? null,
-        llmProcessingTime   : data?.llmProcessingTime ?? null,
-      });
-    } catch (error) {
-      setErrorObject({
-        title   : (error as Error).name ?? "Internal server error",
-        message : (error as Error).message ?? "Please try again later",
-      });
-    }
+    onFormSubmit(values, form);
   };
 
-  const handleClickNewTemplate = () => reset(DEFAULT_TEMPLATE_VALUES);
-
-  const showErrorMessage = !!errorObject && !isSubmitting;
-  const showResults      = !isSubmitting && !showErrorMessage;
-
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
-      <Form { ...form }>
-        <form
-          onSubmit={ handleSubmit(onSubmit) }
-          className="space-y-6 basis-1/2 h-fit"
-        >
-          <div className="flex justify-between">
-            <BrowseTemplate />
-            { selectedTemplate?.id && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={ handleClickNewTemplate }
-              >
-                Create New
-              </Button>
-            ) }
-          </div>
-          <TemplateInfoCard />
-          <AttributesCard />
-          <IgnoreCacheCheckbox control={ control } />
-          <Button type="submit" className="w-full" disabled={ isSubmitting }>
-            Submit
-          </Button>
-        </form>
-      </Form>
-      <ResultSection
-        resultRef={ resultRef }
-        isSubmitting={ isSubmitting }
-        showErrorMessage={ showErrorMessage }
-        error={ errorObject }
-        showResults={ showResults }
-        objectResult={ objectResult }
-        executionTime={ executionTime }
-      />
-    </div>
+    <Form { ...form }>
+      <form
+        onSubmit={ handleSubmit(onSubmit) }
+        className="space-y-6"
+      >
+        <TemplateInfoCard />
+        <AttributesCard />
+        <IgnoreCacheCheckbox control={ control } />
+        <Button type="submit" className="w-full" disabled={ isSubmitting }>
+          Submit
+        </Button>
+      </form>
+    </Form>
   );
 }
 
@@ -257,45 +133,5 @@ function IgnoreCacheCheckbox({ control }: { control: any }) {
         </FormItem>
       ) }
     />
-  );
-}
-
-function ResultSection({
-  resultRef,
-  isSubmitting,
-  showErrorMessage,
-  error,
-  showResults,
-  objectResult,
-  executionTime,
-}: {
-  resultRef: React.RefObject<HTMLDivElement>;
-  isSubmitting: boolean;
-  showErrorMessage: boolean;
-  error: ErrorObject | null;
-  showResults: boolean;
-  objectResult: any;
-  executionTime: ExecutionTime;
-}) {
-  return (
-    <div ref={ resultRef } className="basis-1/2">
-      { isSubmitting && (
-        <Skeleton className="w-full h-64 bg-[#272822] text-[#f8f8f2]" />
-      ) }
-      { showErrorMessage && (
-        <div className="w-full flex justify-center items-center min-h-[400px] bg-[#272822] text-[#f8f8f2] font-bold rounded-lg p-6 shadow-md">
-          <div className="text-center">
-            <h2 className="text-xl mb-2">{ error?.title }</h2>
-            <p>{ error?.message }</p>
-          </div>
-        </div>
-      ) }
-      { showResults && (
-        <>
-          <JsonResultView objectResult={ objectResult } />
-          <ExecutionTimeResult executionTime={ executionTime } />
-        </>
-      ) }
-    </div>
   );
 }

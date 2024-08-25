@@ -17,7 +17,6 @@ import { Template } from "@/schemas/template-schema";
 import { useTemplateStore } from "@/store/template-store";
 import { Circle, CircleCheck, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { FormLabel } from "./ui/form";
 
 interface TemplateListProps {
   templates: Template[];
@@ -114,7 +113,6 @@ export default function BrowseTemplate() {
         </DialogHeader>
 
         <div className="mb-4">
-          <FormLabel htmlFor="templateSearch">Search</FormLabel>
           <input
             id="templateSearch"
             type="text"
