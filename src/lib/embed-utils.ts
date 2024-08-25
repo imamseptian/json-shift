@@ -26,8 +26,8 @@ const EMBEDDINGS_CONFIG = {
  * Configuration for the text splitter.
  */
 const TEXT_SPLITTER_CONFIG = {
-  chunkSize    : 2000,
-  chunkOverlap : 200,
+  chunkSize    : 1000,
+  chunkOverlap : 100,
 };
 
 /**
@@ -133,7 +133,7 @@ export async function retrieveSimilarContext(
 
   const similaritySearchResults = await vectorStore.similaritySearch(
     query,
-    10,
+    30,
     filter,
   );
 
