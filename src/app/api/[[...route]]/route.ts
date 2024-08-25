@@ -21,7 +21,7 @@ const app = new Hono().basePath("/api");
 app.use(
   "/api/*",
   cors({
-    origin       : process.env.NODE_ENV === "production" ? process.env.BASE_URL : "*",
+    origin       : process.env.NODE_ENV === "production" ? process.env.BASE_URL! : "*",
     allowMethods : ["POST", "GET", "OPTIONS"],
     maxAge       : 600,
     credentials  : true,
