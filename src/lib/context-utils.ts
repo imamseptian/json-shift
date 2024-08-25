@@ -24,7 +24,7 @@ const redis = new Redis({
 const generateRedisKey = (uuid: string, url: string): string => `${uuid}-${url}`;
 
 export async function getContext({
-  id = "sadasd",
+  id = "",
   url,
   attributes,
   isGroupScraping = true,
