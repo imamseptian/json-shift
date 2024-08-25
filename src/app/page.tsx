@@ -102,6 +102,7 @@ export default function Homepage() {
             latestResult: data?.answer ?? null,
           };
           updateTemplate(updatedTemplate);
+          setSelectedTemplate(updatedTemplate);
         } else {
           const newTemplate = {
             ...formValues,
