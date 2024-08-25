@@ -3,4 +3,4 @@ export const measureExecutionTime = (startTime: number) => {
   return `${endTime - startTime} ms`;
 };
 
-export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number) => new Promise((resolve) => { setTimeout(resolve, ms); });
