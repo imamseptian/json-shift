@@ -1,6 +1,7 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatGroq } from "@langchain/groq";
 import { LLM_MODEL_OPTIONS } from "./constants";
+import { env } from "./env";
 
 /**
  * Type for supported LLM models
@@ -13,11 +14,11 @@ type SupportedModel =
  */
 const MODEL_CREATORS = {
   groq: (model: string) => new ChatGroq({
-    apiKey    : process.env.GROQ_API_KEY,
+    apiKey    : env.GROQ_API_KEY,
     modelName : model,
   }),
   gemini: (model: string) => new ChatGoogleGenerativeAI({
-    apiKey    : process.env.GOOGLE_AI_STUDIO_API_KEY,
+    apiKey    : env.GOOGLE_AI_STUDIO_API_KEY,
     modelName : model,
   }),
 };

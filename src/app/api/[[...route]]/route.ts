@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 
 import RequestTimeoutError from "@/errors/request-timeout-error";
 import ValidationError from "@/errors/validation-error";
+import { env } from "@/lib/env";
 import extractRoute from "@/routes/extract-route";
 import vectorStoreRoute from "@/routes/vectorstore-routes";
 import { cors } from "hono/cors";
@@ -21,7 +22,7 @@ const app = new Hono().basePath("/api");
 app.use(
   "/api/*",
   cors({
-    origin       : process.env.NODE_ENV === "production" ? process.env.BASE_URL! : "*",
+    origin       : env.NODE_ENV === "production" ? env.BASE_URL : "*",
     allowMethods : ["POST", "GET", "OPTIONS"],
     maxAge       : 600,
     credentials  : true,

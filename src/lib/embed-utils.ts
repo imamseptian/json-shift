@@ -6,6 +6,7 @@ import { Index } from "@upstash/vector";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { formatDocumentsAsString } from "langchain/util/document";
 import { v4 as uuidv4 } from "uuid";
+import { env } from "./env";
 import {
   Content,
   formatContentForLangChain,
@@ -16,7 +17,7 @@ import {
  * Configuration for the embeddings model.
  */
 const EMBEDDINGS_CONFIG = {
-  apiKey    : process.env.COHERE_API_KEY,
+  apiKey    : env.COHERE_API_KEY,
   batchSize : 48,
   model     : "embed-multilingual-v3.0",
 };
@@ -38,8 +39,8 @@ const embeddings = new CohereEmbeddings(EMBEDDINGS_CONFIG);
  * Creates and configures the Upstash index.
  */
 const indexWithCredentials = new Index({
-  url   : process.env.UPSTASH_VECTOR_REST_URL,
-  token : process.env.UPSTASH_VECTOR_REST_TOKEN,
+  url   : env.UPSTASH_VECTOR_REST_URL,
+  token : env.UPSTASH_VECTOR_REST_TOKEN,
 });
 
 /**

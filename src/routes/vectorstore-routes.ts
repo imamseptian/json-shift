@@ -1,4 +1,5 @@
 import { deleteAllStoredDocuments } from "@/lib/embed-utils";
+import { env } from "@/lib/env";
 import { Context, Hono } from "hono";
 
 const vectorStoreRoute = new Hono();
@@ -11,7 +12,7 @@ const vectorStoreRoute = new Hono();
  */
 vectorStoreRoute.post("clear", async (c: Context) => {
   const accessToken = c.req.header("accessToken");
-  if (accessToken !== process.env.CLEAR_UPSTASH_VECTOR_STORE_TOKEN) {
+  if (accessToken !== env.CLEAR_UPSTASH_VECTOR_STORE_TOKEN) {
     throw new Error("Unauthorized: Invalid access token");
   }
 

@@ -1,6 +1,7 @@
 import chromium from "@sparticuz/chromium";
 import * as puppeteer from "puppeteer";
 import puppeteerCore from "puppeteer-core";
+import { env } from "./env";
 
 interface TextContent {
   type: "text";
@@ -66,12 +67,12 @@ export async function extractGroupedContentFromWeb(
 ): Promise<GroupedContent[]> {
   let browser = null;
 
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     browser = await puppeteer.launch({
       args     : ["--no-sandbox", "--disable-setuid-sandbox"],
       headless : true,
     });
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (env.NODE_ENV === "production") {
     browser = await puppeteerCore.launch({
       args            : chromium.args,
       defaultViewport : chromium.defaultViewport,
@@ -282,12 +283,12 @@ export async function extractGroupedContentFromWeb(
 export async function extractContentsFromWeb(url: string): Promise<Content[]> {
   let browser = null;
 
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     browser = await puppeteer.launch({
       args     : ["--no-sandbox", "--disable-setuid-sandbox"],
       headless : true,
     });
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (env.NODE_ENV === "production") {
     browser = await puppeteerCore.launch({
       args            : chromium.args,
       defaultViewport : chromium.defaultViewport,

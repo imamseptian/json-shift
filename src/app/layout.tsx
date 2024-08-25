@@ -1,6 +1,7 @@
 import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -34,14 +35,14 @@ export const metadata: Metadata = {
   openGraph: {
     type     : "website",
     locale   : "en_US",
-    url      : process.env.BASE_URL,
+    url      : env.BASE_URL,
     siteName : "JsonShift",
     title    : "JsonShift",
     description:
       "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
     images: [
       {
-        url    : `${process.env.BASE_URL}/og-image.png`,
+        url    : `${env.BASE_URL}/og-image.png`,
         width  : 1200,
         height : 630,
         alt    : "JsonShift - Document to JSON",
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
       "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
     images: [
       {
-        url    : `${process.env.BASE_URL}/og-image.png`,
+        url    : `${env.BASE_URL}/og-image.png`,
         width  : 1200,
         height : 630,
         alt    : "JsonShift - Document to JSON",
