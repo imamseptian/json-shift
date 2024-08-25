@@ -25,17 +25,17 @@ export default function TextareaField({
 
   return (
     <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
+      control={ control }
+      name={ name }
+      render={ ({ field }) => (
         <FormItem>
-          <FormLabel>{label || name}</FormLabel>
+          <FormLabel>{ label || name }</FormLabel>
           <FormControl>
-            <Textarea {...props} {...field} />
+            <Textarea { ...props } { ...field } />
           </FormControl>
           <FormMessage />
         </FormItem>
-      )}
+      ) }
     />
   );
 }

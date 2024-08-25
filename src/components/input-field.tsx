@@ -28,18 +28,18 @@ export default function InputField({
   const { control } = useFormContext();
   return (
     <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel>{label || name}</FormLabel>
+      control={ control }
+      name={ name }
+      render={ ({ field }) => (
+        <FormItem className={ className }>
+          <FormLabel>{ label || name }</FormLabel>
           <FormControl>
-            <Input {...props} {...field} />
+            <Input { ...props } { ...field } />
           </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
+          { description && <FormDescription>{ description }</FormDescription> }
           <FormMessage />
         </FormItem>
-      )}
+      ) }
     />
   );
 }
