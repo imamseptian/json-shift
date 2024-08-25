@@ -5,7 +5,7 @@ import { Context, Hono } from "hono";
 
 const extractRoute = new Hono();
 
-const TIMEOUT_DURATION = 30 * 1000;
+const TIMEOUT_DURATION = 50 * 1000;
 
 extractRoute.use("*", limiterMiddleware);
 
@@ -17,7 +17,7 @@ extractRoute.use("*", limiterMiddleware);
 extractRoute.post("/", async (c: Context) => {
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
-      reject(new RequestTimeoutError("Request timeout after 30 seconds"));
+      reject(new RequestTimeoutError("Request timeout after 50 seconds"));
     }, TIMEOUT_DURATION);
   });
 
