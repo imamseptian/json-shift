@@ -10,7 +10,7 @@ import { z } from "zod";
 import { DEFAULT_LLM_MODEL } from "./constants";
 import { getModel } from "./llm-utils";
 
-const MAX_TOKENS = 4000;
+// const MAX_TOKENS = 4000;
 
 /**
  * Safely parses a JSON string using a JsonOutputParser.
@@ -35,10 +35,10 @@ async function safeJsonParse(jsonString: string): Promise<any> {
  */
 export function setupLangChain(
   attributes: AttributeType[],
-  modelName: string = DEFAULT_LLM_MODEL
+  modelName: string = DEFAULT_LLM_MODEL,
 ): RunnableSequence {
-  const query = generatePromptTemplate(attributes);
-  const model = getModel(modelName);
+  const query  = generatePromptTemplate(attributes);
+  const model  = getModel(modelName);
   const prompt = ChatPromptTemplate.fromTemplate(query);
 
   return RunnableSequence.from([
@@ -100,7 +100,7 @@ function handleArrayAttribute(attribute: ArrayAttribute): string {
  */
 function handleObjectAttribute(attribute: ObjectAttribute): string {
   const { name, properties } = attribute;
-  const objectSchema = properties
+  const objectSchema         = properties
     .map((prop) => `${name}.${prop.name}: "${prop.type}"`)
     .join(", ");
   return `{{${objectSchema}}}`;
@@ -136,8 +136,8 @@ function generateAttributeDescriptions(attributes: AttributeType[]): string {
  */
 function handleArrayDescription(attribute: ArrayAttribute): string {
   const { name, description, items } = attribute;
-  let arrayDesc = description ? `${name} is ${description}, ` : "";
-  arrayDesc += `${name} is an array of ${items.type}s`;
+  let arrayDesc                      = description ? `${name} is ${description}, ` : "";
+  arrayDesc                         += `${name} is an array of ${items.type}s`;
 
   if (items.type === "object" && items.properties) {
     arrayDesc += " with the following description:\n";
@@ -157,9 +157,9 @@ function handleArrayDescription(attribute: ArrayAttribute): string {
  */
 function handleObjectDescription(attribute: ObjectAttribute): string {
   const { name, description, properties } = attribute;
-  let objectDesc = description ? `${name} is ${description}\n` : "";
-  objectDesc += `${name} is an object with the following description:\n`;
-  objectDesc += properties
+  let objectDesc                          = description ? `${name} is ${description}\n` : "";
+  objectDesc                             += `${name} is an object with the following description:\n`;
+  objectDesc                             += properties
     .filter((prop) => prop.description)
     .map((prop) => `- ${name}.${prop.name}: ${prop.description}`)
     .join("\n");
@@ -173,8 +173,8 @@ function handleObjectDescription(attribute: ObjectAttribute): string {
  */
 export function generatePromptTemplate(attributes: AttributeType[]): string {
   const listAttributeString = generateAttributeList(attributes);
-  const schemaString = generateSchemaString(attributes);
-  const description = generateAttributeDescriptions(attributes);
+  const schemaString        = generateSchemaString(attributes);
+  const description         = generateAttributeDescriptions(attributes);
 
   return `
 You are an AI assistant designed to extract specific information from web content. Your task is to analyze the given context and extract the requested attributes.
@@ -219,10 +219,10 @@ Generate the JSON string with the requested information. Your entire response mu
  */
 export function setupJsonLangChain(
   attributes: AttributeType[],
-  modelName: string = DEFAULT_LLM_MODEL
+  modelName: string = DEFAULT_LLM_MODEL,
 ): RunnableSequence {
-  const schema = createSchemaFromAttributes(attributes);
-  const model = getModel(modelName);
+  const schema        = createSchemaFromAttributes(attributes);
+  const model         = getModel(modelName);
   const structuredLlm = model.withStructuredOutput(schema);
 
   const prompt = ChatPromptTemplate.fromTemplate(`
@@ -266,17 +266,17 @@ function createArrayZod(attribute: ArrayAttribute): z.ZodType {
   const { items, description } = attribute;
   if (items.type === "object" && items.properties) {
     const objectProperties = items.properties.map((attr) => ({
-      name: attr.name,
-      type: attr.type,
-      description: attr.description,
+      name        : attr.name,
+      type        : attr.type,
+      description : attr.description,
     }));
     return z.array(createObjectZod(objectProperties)).describe(description);
   }
   return z.array(
     primitiveZodSchema(
       items.type as "string" | "number" | "boolean",
-      description
-    )
+      description,
+    ),
   );
 }
 
@@ -296,7 +296,7 @@ function createObjectZod(properties: ObjectProperty[]): z.ZodObject<any> {
     properties.map((attr) => [
       attr.name,
       primitiveZodSchema(attr.type, attr.description),
-    ])
+    ]),
   );
   return z.object(objectZod);
 }
@@ -309,7 +309,7 @@ function createObjectZod(properties: ObjectProperty[]): z.ZodObject<any> {
  */
 const primitiveZodSchema = (
   type: "string" | "number" | "boolean",
-  description: string
+  description: string,
 ): z.ZodType => {
   switch (type) {
     case "string":
@@ -345,10 +345,10 @@ const typeToZod = (attribute: AttributeType): z.ZodType => {
  * @returns {z.ZodObject} A Zod schema for the attributes.
  */
 const createSchemaFromAttributes = (
-  attributes: AttributeType[]
+  attributes: AttributeType[],
 ): z.ZodObject<any> => {
   const shape = Object.fromEntries(
-    attributes.map((attr) => [attr.name, typeToZod(attr)])
+    attributes.map((attr) => [attr.name, typeToZod(attr)]),
   );
   return z.object(shape);
 };

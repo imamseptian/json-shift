@@ -1,6 +1,6 @@
 export const LLM_MODEL_OPTIONS = {
-  gemini: ["gemini-pro", "gemini-1.5-flash"],
-  groq: ["mixtral-8x7b-32768"],
+  gemini : ["gemini-pro", "gemini-1.5-flash"],
+  groq   : ["mixtral-8x7b-32768"],
 };
 
 export type LLMProvider = "gemini" | "groq";

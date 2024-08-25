@@ -17,17 +17,17 @@ import {
  * Configuration for the embeddings model.
  */
 const EMBEDDINGS_CONFIG = {
-  apiKey: env.COHERE_API_KEY,
-  batchSize: 48,
-  model: "embed-multilingual-v3.0",
+  apiKey    : env.COHERE_API_KEY,
+  batchSize : 48,
+  model     : "embed-multilingual-v3.0",
 };
 
 /**
  * Configuration for the text splitter.
  */
 const TEXT_SPLITTER_CONFIG = {
-  chunkSize: 2000,
-  chunkOverlap: 200,
+  chunkSize    : 2000,
+  chunkOverlap : 200,
 };
 
 /**
@@ -39,8 +39,8 @@ const embeddings = new CohereEmbeddings(EMBEDDINGS_CONFIG);
  * Creates and configures the Upstash index.
  */
 const indexWithCredentials = new Index({
-  url: env.UPSTASH_VECTOR_REST_URL,
-  token: env.UPSTASH_VECTOR_REST_TOKEN,
+  url   : env.UPSTASH_VECTOR_REST_URL,
+  token : env.UPSTASH_VECTOR_REST_TOKEN,
 });
 
 /**
@@ -58,19 +58,19 @@ const vectorStore = new UpstashVectorStore(embeddings, {
  */
 async function processDocuments(
   contents: GroupedContent[],
-  url: string
+  url: string,
 ): Promise<Document[]> {
   const textSplitter = new RecursiveCharacterTextSplitter(TEXT_SPLITTER_CONFIG);
 
   const splitDocuments = await Promise.all(
     contents.map(async (content) => {
-      const contentString = formatContentForLangChain(content.blocks);
+      const contentString      = formatContentForLangChain(content.blocks);
       const document: Document = {
-        pageContent: contentString,
-        metadata: { source: url, group_id: content.group_id },
+        pageContent : contentString,
+        metadata    : { source: url, group_id: content.group_id },
       };
       return textSplitter.splitDocuments([document]);
-    })
+    }),
   );
 
   return splitDocuments.flat();
@@ -84,7 +84,7 @@ async function processDocuments(
  */
 export async function embedAndStoreGroupedWebContent(
   contents: GroupedContent[],
-  url: string
+  url: string,
 ): Promise<string[]> {
   const groupedDocuments = await processDocuments(contents, url);
   return vectorStore.addDocuments(groupedDocuments, {
@@ -100,16 +100,16 @@ export async function embedAndStoreGroupedWebContent(
  */
 export async function embedAndStoreWebContent(
   contents: Content[],
-  url: string
+  url: string,
 ): Promise<string[]> {
-  const context = formatContentForLangChain(contents);
+  const context      = formatContentForLangChain(contents);
   const textSplitter = new RecursiveCharacterTextSplitter(TEXT_SPLITTER_CONFIG);
 
   const document: Document = {
-    pageContent: context,
-    metadata: { source: url },
+    pageContent : context,
+    metadata    : { source: url },
   };
-  const splitDocuments = await textSplitter.splitDocuments([document]);
+  const splitDocuments     = await textSplitter.splitDocuments([document]);
 
   return vectorStore.addDocuments(splitDocuments, {
     ids: splitDocuments.map(() => uuidv4()),
@@ -124,17 +124,17 @@ export async function embedAndStoreWebContent(
  */
 export async function retrieveSimilarContext(
   url: string,
-  attributes: AttributeType[]
+  attributes: AttributeType[],
 ): Promise<string> {
   const filter = `source = '${url}'`;
-  const query = attributes
+  const query  = attributes
     .map((attribute) => `${attribute.name}: ${attribute.description}`)
     .join(", ");
 
   const similaritySearchResults = await vectorStore.similaritySearch(
     query,
     10,
-    filter
+    filter,
   );
 
   return formatDocumentsAsString(similaritySearchResults);

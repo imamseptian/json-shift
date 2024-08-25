@@ -17,13 +17,11 @@ import {
 import { AttributeType } from "@/schemas/template-schema";
 
 const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL!,
-  token: env.UPSTASH_REDIS_REST_TOKEN!,
+  url   : env.UPSTASH_REDIS_REST_URL!,
+  token : env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-const generateRedisKey = (uuid: string, url: string): string => {
-  return `${uuid}-${url}`;
-};
+const generateRedisKey = (uuid: string, url: string): string => `${uuid}-${url}`;
 
 export async function getContext({
   id = "sadasd",
@@ -45,17 +43,17 @@ export async function getContext({
     const cachedContext = await redis.get(redisKey);
     if (cachedContext) {
       return {
-        scrapeExecutionTime: 0,
-        embeddingTime: 0,
-        context: cachedContext as string,
-        storedDocumentIds: [],
+        scrapeExecutionTime : 0,
+        embeddingTime       : 0,
+        context             : cachedContext as string,
+        storedDocumentIds   : [],
       };
     }
   }
 
   // Scrape web content
-  const scrapeStartTime = Date.now();
-  const contents = isGroupScraping
+  const scrapeStartTime     = Date.now();
+  const contents            = isGroupScraping
     ? await extractGroupedContentFromWeb(url)
     : await extractContentsFromWeb(url);
   const scrapeExecutionTime = measureExecutionTime(scrapeStartTime);
@@ -66,19 +64,19 @@ export async function getContext({
 
   // Embed and store content
   const embeddingStartTime = Date.now();
-  const storedDocumentIds = isGroupScraping
+  const storedDocumentIds  = isGroupScraping
     ? await embedAndStoreGroupedWebContent(contents as GroupedContent[], url)
     : await embedAndStoreWebContent(contents as Content[], url);
 
   await delay(1000);
-  const context = await retrieveSimilarContext(
+  const context       = await retrieveSimilarContext(
     url,
-    attributes as AttributeType[]
+    attributes as AttributeType[],
   );
   const embeddingTime = measureExecutionTime(embeddingStartTime);
 
   // Clean and truncate context
-  const cleanedContext = context.replace(/\s+/g, " ").trim();
+  const cleanedContext   = context.replace(/\s+/g, " ").trim();
   const truncatedContext = truncateString(cleanedContext);
 
   // Cache the context

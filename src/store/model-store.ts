@@ -16,14 +16,14 @@ type PersistType = (
 
 const useModelStore = create<ModelStoreType>(
   (persist as PersistType)(
-    (set, get) => ({
-      model: DEFAULT_LLM_MODEL,
-      setModel: (model) => set({ model }),
+    (set) => ({
+      model    : DEFAULT_LLM_MODEL,
+      setModel : (model) => set({ model }),
     }),
     {
       name: MODEL_LOCAL_STORAGE_TEMPLATES_KEY,
-    }
-  )
+    },
+  ),
 );
 
 export { useModelStore };

@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -22,72 +25,72 @@ interface TemplateListProps {
   onDeleteClick: (item: Template) => void;
 }
 
-const TemplateList: React.FC<TemplateListProps> = ({
+function TemplateList({
   templates,
   onItemClick,
   onDeleteClick,
-}) => {
+}: TemplateListProps) {
   const { selectedTemplate } = useTemplateStore();
 
   return (
     <ul className="space-y-4">
-      {templates.map((template) => {
+      { templates.map((template) => {
         const isSelected = selectedTemplate?.id === template.id;
         return (
-          <li key={template.id} className="flex items-center">
+          <li key={ template.id } className="flex items-center">
             <div
-              className={`w-full cursor-pointer p-4 rounded-lg bg-secondary ${
+              className={ `w-full cursor-pointer p-4 rounded-lg bg-secondary ${
                 isSelected ? "ring-2" : ""
-              }`}
-              onClick={() => onItemClick(template)}
+              }` }
+              onClick={ () => onItemClick(template) }
             >
               <h3 className="flex items-center gap-2 text-xl font-bold mb-3">
-                {isSelected ? <CircleCheck /> : <Circle />}
-                <span>{template.name}</span>
+                { isSelected ? <CircleCheck /> : <Circle /> }
+                <span>{ template.name }</span>
               </h3>
-              <p className="text-muted-foreground text-sm">{template.url}</p>
+              <p className="text-muted-foreground text-sm">{ template.url }</p>
             </div>
             <Button
               variant="ghost"
               type="button"
               className="ml-2"
-              onClick={() => onDeleteClick(template)}
-              aria-label={`Delete template ${template.name}`}
+              onClick={ () => onDeleteClick(template) }
+              aria-label={ `Delete template ${template.name}` }
             >
               <X className="w-8 h-8" />
             </Button>
           </li>
         );
-      })}
+      }) }
     </ul>
   );
-};
+}
 
 export default function BrowseTemplate() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterText, setFilterText] = useState("");
-  const { templates, selectedTemplate, setSelectedTemplate, deleteTemplate } =
-    useTemplateStore();
+  const [filterText, setFilterText]   = useState("");
+  const {
+    templates, setSelectedTemplate, deleteTemplate,
+  } =    useTemplateStore();
 
   const debouncedFilterText = useDebounce(filterText, 300);
 
   const isLoading = filterText !== debouncedFilterText;
 
   const filterTemplate = useCallback(
-    (templates: Template[], filter: string) => {
+    (currentTemplates: Template[], filter: string) => {
       const lowerCaseFilter = filter.toLowerCase();
-      return templates.filter(
-        (template) =>
-          template.name.toLowerCase().includes(lowerCaseFilter) ||
-          template.url.toLowerCase().includes(lowerCaseFilter)
+      return currentTemplates.filter(
+        (template) => template.name.toLowerCase().includes(lowerCaseFilter)
+          || template.url.toLowerCase().includes(lowerCaseFilter),
       );
     },
-    []
+    [],
   );
 
   const filteredTemplates = useMemo(
     () => filterTemplate(templates, debouncedFilterText),
-    [filterTemplate, templates, debouncedFilterText]
+    [filterTemplate, templates, debouncedFilterText],
   );
 
   const handleItemClick = (template: Template) => {
@@ -100,7 +103,7 @@ export default function BrowseTemplate() {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={ isModalOpen } onOpenChange={ setIsModalOpen }>
       <DialogTrigger asChild>
         <Button variant="success">Browse Templates</Button>
       </DialogTrigger>
@@ -117,19 +120,23 @@ export default function BrowseTemplate() {
             type="text"
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-3"
             placeholder="Search..."
-            onChange={(e) => setFilterText(e.target.value)}
+            onChange={ (e) => setFilterText(e.target.value) }
           />
         </div>
 
-        {isLoading ? (
+        { isLoading ? (
           <p>Loading...</p>
         ) : (
           <TemplateList
-            templates={filteredTemplates}
-            onItemClick={handleItemClick}
-            onDeleteClick={handleDeleteClick}
+            templates={ filteredTemplates }
+            onItemClick={ handleItemClick }
+            onDeleteClick={ handleDeleteClick }
           />
-        )}
+        ) }
+
+        { filteredTemplates.length === 0 && (
+          <p className="text-center">No templates found</p>
+        ) }
       </DialogContent>
     </Dialog>
   );

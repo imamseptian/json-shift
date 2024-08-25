@@ -12,13 +12,13 @@ export default function PropertyItemsField({ index }: { index: number }) {
   return (
     <>
       <SelectField
-        name={`attributes.${index}.items.type`}
+        name={ `attributes.${index}.items.type` }
         label="Items"
-        options={ITEM_TYPES}
+        options={ ITEM_TYPES }
       />
-      {currentType === "object" && (
-        <PropertyObjectField index={index} isArray={true} />
-      )}
+      { currentType === "object" && (
+        <PropertyObjectField index={ index } isArray />
+      ) }
     </>
   );
 }

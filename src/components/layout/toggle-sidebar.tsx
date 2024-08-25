@@ -23,8 +23,8 @@ export default function ToggleSidebar({
     }
   };
   return (
-    <Button type="button" onClick={toggleSidebar} variant="ghost">
-      {children || <Menu />}
+    <Button type="button" onClick={ toggleSidebar } variant="ghost">
+      { children || <Menu /> }
     </Button>
   );
 }

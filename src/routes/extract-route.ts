@@ -28,21 +28,18 @@ extractRoute.post("/", async (c: Context) => {
     ]);
     return result;
   } catch (error) {
-    console.error("Error in /extract:", error);
-
     if (error instanceof RequestTimeoutError) {
       return c.json(
         {
-          code: "REQUEST_TIMEOUT",
-          title: "Request Timeout",
+          code  : "REQUEST_TIMEOUT",
+          title : "Request Timeout",
           message:
             "The request took too long to process. Please try again later.",
         },
-        504
+        504,
       );
-    } else {
-      throw error;
     }
+    throw error;
   }
 });
 

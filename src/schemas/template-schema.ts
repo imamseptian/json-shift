@@ -54,17 +54,17 @@ const BaseAttributeSchema = z.object({
   // name: z.string().min(1, "Cannot be empty"),
   name: z
     .string({
-      required_error: "Name is required",
-      invalid_type_error: "Name must be a string",
+      required_error     : "Name is required",
+      invalid_type_error : "Name must be a string",
     })
     .min(1, "Name cannot be empty")
     .regex(
       /^[a-zA-Z_$][a-zA-Z0-9_$]*$/,
-      "Name must start with a letter, underscore, or dollar sign, and can only contain letters, numbers, underscores, or dollar signs"
+      "Name must start with a letter, underscore, or dollar sign, and can only contain letters, numbers, underscores, or dollar signs",
     )
     .refine(
       (key) => !reservedKeywords.includes(key),
-      "Object key cannot be a reserved JavaScript keyword"
+      "Object key cannot be a reserved JavaScript keyword",
     ),
   description: z.string().min(1, "Cannot be empty"),
 });
@@ -75,15 +75,15 @@ const SimpleAttributeSchema = BaseAttributeSchema.extend({
 });
 
 const ObjectAttributeSchema = BaseAttributeSchema.extend({
-  type: z.literal("object"),
-  properties: z.array(SimpleAttributeSchema),
+  type       : z.literal("object"),
+  properties : z.array(SimpleAttributeSchema),
 });
 
 const ArrayAttributeSchema = BaseAttributeSchema.extend({
-  type: z.literal("array"),
-  items: z.object({
-    type: z.enum(["string", "number", "boolean", "object"]),
-    properties: z.array(SimpleAttributeSchema).optional(),
+  type  : z.literal("array"),
+  items : z.object({
+    type       : z.enum(["string", "number", "boolean", "object"]),
+    properties : z.array(SimpleAttributeSchema).optional(),
   }),
   // properties: z.array(SimpleAttributeSchema).optional(),
 });
@@ -95,14 +95,14 @@ export const AttributeSchema = z.discriminatedUnion("type", [
 ]);
 
 export const TemplateSchema = z.object({
-  id: z.string().optional(),
-  url: z.string().url(),
-  name: z.string().min(5, "Cannot be empty"),
-  attributes: z.array(AttributeSchema).min(1, "Cannot be empty"),
-  latestResult: z.any().optional(),
-  createdAt: z.union([z.date(), z.string()]).optional(),
-  updatedAt: z.union([z.string(), z.date()]).optional(),
-  ignoreCache: z.boolean().optional(),
+  id           : z.string().optional(),
+  url          : z.string().url(),
+  name         : z.string().min(5, "Cannot be empty"),
+  attributes   : z.array(AttributeSchema).min(1, "Cannot be empty"),
+  latestResult : z.any().optional(),
+  createdAt    : z.union([z.date(), z.string()]).optional(),
+  updatedAt    : z.union([z.string(), z.date()]).optional(),
+  ignoreCache  : z.boolean().optional(),
 });
 
 export type Template = z.infer<typeof TemplateSchema>;
@@ -111,14 +111,14 @@ export type ArrayAttribute = z.infer<typeof ArrayAttributeSchema>;
 export type AttributeType = z.infer<typeof AttributeSchema>;
 
 export const DEFAULT_TEMPLATE_VALUE: Template = {
-  id: "",
-  name: "",
-  url: "",
-  attributes: [
+  id         : "",
+  name       : "",
+  url        : "",
+  attributes : [
     {
-      name: "",
-      type: "string",
-      description: "",
+      name        : "",
+      type        : "string",
+      description : "",
     },
   ],
 };

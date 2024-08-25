@@ -63,21 +63,21 @@ export interface GroupedContent {
 }
 
 export async function extractGroupedContentFromWeb(
-  url: string
+  url: string,
 ): Promise<GroupedContent[]> {
   let browser = null;
 
   if (env.NODE_ENV === "development") {
     browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+      args     : ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless : true,
     });
   } else if (env.NODE_ENV === "production") {
     browser = await puppeteerCore.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      args            : chromium.args,
+      defaultViewport : chromium.defaultViewport,
+      executablePath  : await chromium.executablePath(),
+      headless        : chromium.headless,
     });
   }
 
@@ -92,9 +92,9 @@ export async function extractGroupedContentFromWeb(
 
     // @ts-ignore
     const content = await page.evaluate<() => GroupedContent[]>(() => {
-      const groupedResults: GroupedContent[] = [];
+      const groupedResults: GroupedContent[]  = [];
       let currentGroup: GroupedContent | null = null;
-      let groupCounter = 0;
+      let groupCounter                        = 0;
 
       const elementsToIgnore = [
         "nav",
@@ -106,11 +106,10 @@ export async function extractGroupedContentFromWeb(
         "noscript",
         "iframe",
       ];
-      const classesToIgnore = ["advertisement", "sidebar", "comment"];
+      const classesToIgnore  = ["advertisement", "sidebar", "comment"];
 
       function shouldIgnoreElement(element: Element): boolean {
-        if (elementsToIgnore.includes(element.tagName.toLowerCase()))
-          return true;
+        if (elementsToIgnore.includes(element.tagName.toLowerCase())) return true;
         if (element.closest(elementsToIgnore.join(","))) return true;
         for (const className of classesToIgnore) {
           if (element.classList.contains(className)) return true;
@@ -121,14 +120,14 @@ export async function extractGroupedContentFromWeb(
       function createNewGroup(): GroupedContent {
         groupCounter++;
         return {
-          group_id: `group${groupCounter}`,
-          blocks: [],
+          group_id : `group${groupCounter}`,
+          blocks   : [],
         };
       }
 
       function truncateText(text: string, maxLength: number): string {
         return text.length > maxLength
-          ? text.slice(0, maxLength) + "..."
+          ? `${text.slice(0, maxLength)}...`
           : text;
       }
 
@@ -137,9 +136,9 @@ export async function extractGroupedContentFromWeb(
 
         // Start a new group for major structural elements or headings
         if (
-          element.tagName.toLowerCase() === "section" ||
-          element.tagName.toLowerCase() === "article" ||
-          /^h[1-3]$/i.test(element.tagName)
+          element.tagName.toLowerCase() === "section"
+          || element.tagName.toLowerCase() === "article"
+          || /^h[1-3]$/i.test(element.tagName)
         ) {
           if (currentGroup && currentGroup.blocks.length > 0) {
             groupedResults.push(currentGroup);
@@ -158,26 +157,26 @@ export async function extractGroupedContentFromWeb(
             const visibleText = element.innerText.trim();
             if (visibleText) {
               content = {
-                type: "link",
-                text: truncateText(visibleText, 100),
-                url: element.href,
+                type : "link",
+                text : truncateText(visibleText, 100),
+                url  : element.href,
               };
             }
           } else if (element instanceof HTMLImageElement) {
             content = {
-              type: "image",
-              src: element.src,
-              alt: truncateText(element.alt || "No alt text provided", 100),
+              type : "image",
+              src  : element.src,
+              alt  : truncateText(element.alt || "No alt text provided", 100),
             };
           } else if (/^h[1-6]$/i.test(element.tagName)) {
             content = {
-              type: "heading",
-              level: parseInt(element.tagName.toLowerCase().charAt(1)),
-              content: truncateText(element.innerText.trim(), 200),
+              type    : "heading",
+              level   : parseInt(element.tagName.toLowerCase().charAt(1)),
+              content : truncateText(element.innerText.trim(), 200),
             };
           } else if (
-            element instanceof HTMLUListElement ||
-            element instanceof HTMLOListElement
+            element instanceof HTMLUListElement
+            || element instanceof HTMLOListElement
           ) {
             const items = Array.from(element.getElementsByTagName("li"))
               .map((li) => truncateText(li.innerText.trim(), 200))
@@ -185,58 +184,54 @@ export async function extractGroupedContentFromWeb(
             if (items.length > 0) {
               content = {
                 type: "list",
-                items: items,
+                items,
               };
             }
           } else if (element instanceof HTMLTableElement) {
             const headers = Array.from(element.getElementsByTagName("th")).map(
-              (th) => truncateText(th.innerText.trim(), 100)
+              (th) => truncateText(th.innerText.trim(), 100),
             );
-            const rows = Array.from(element.getElementsByTagName("tr")).map(
-              (tr) =>
-                Array.from(tr.getElementsByTagName("td")).map((td) =>
-                  truncateText(td.innerText.trim(), 100)
-                )
+            const rows    = Array.from(element.getElementsByTagName("tr")).map(
+              (tr) => Array.from(tr.getElementsByTagName("td")).map((td) => truncateText(td.innerText.trim(), 100)),
             );
             if (headers.length > 0 || rows.length > 0) {
               content = {
                 type: "table",
-                headers: headers,
-                rows: rows,
+                headers,
+                rows,
               };
             }
           } else if (element instanceof HTMLQuoteElement) {
             content = {
-              type: "quote",
-              content: truncateText(element.innerText.trim(), 500),
+              type    : "quote",
+              content : truncateText(element.innerText.trim(), 500),
             };
           } else {
             const visibleText = element.innerText.trim();
             if (visibleText) {
               content = {
-                type: "text",
-                content: truncateText(visibleText, 1000),
+                type    : "text",
+                content : truncateText(visibleText, 1000),
               };
             }
           }
 
           if (content) {
             const currentGroupBlocksLength = currentGroup.blocks.length;
-            const contentExists = currentGroup.blocks.some(
+            const contentExists            = currentGroup.blocks.some(
               (currentContent, index) => {
                 const isLastTenIndexes = index >= currentGroupBlocksLength - 10;
                 if (
-                  currentContent.type === "text" &&
-                  content.type === "text" &&
-                  isLastTenIndexes
+                  currentContent.type === "text"
+                  && content.type === "text"
+                  && isLastTenIndexes
                 ) {
                   return currentContent.content.includes(content.content);
-                } else {
-                  return (
-                    JSON.stringify(currentContent) === JSON.stringify(content)
-                  );
                 }
-              }
+                return (
+                  JSON.stringify(currentContent) === JSON.stringify(content)
+                );
+              },
             );
             if (!contentExists) {
               currentGroup.blocks.push(content);
@@ -251,18 +246,18 @@ export async function extractGroupedContentFromWeb(
 
       // Extract meta description
       const metaDescription = document.querySelector(
-        'meta[name="description"]'
+        'meta[name="description"]',
       );
       if (
-        metaDescription instanceof HTMLMetaElement &&
-        metaDescription.content
+        metaDescription instanceof HTMLMetaElement
+        && metaDescription.content
       ) {
         groupedResults.push({
-          group_id: "meta",
-          blocks: [
+          group_id : "meta",
+          blocks   : [
             {
-              type: "meta",
-              description: truncateText(metaDescription.content, 200),
+              type        : "meta",
+              description : truncateText(metaDescription.content, 200),
             },
           ],
         });
@@ -290,15 +285,15 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
 
   if (env.NODE_ENV === "development") {
     browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+      args     : ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless : true,
     });
   } else if (env.NODE_ENV === "production") {
     browser = await puppeteerCore.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      args            : chromium.args,
+      defaultViewport : chromium.defaultViewport,
+      executablePath  : await chromium.executablePath(),
+      headless        : chromium.headless,
     });
   }
 
@@ -325,11 +320,10 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
         "noscript",
         "iframe",
       ];
-      const classesToIgnore = ["advertisement", "sidebar", "comment"];
+      const classesToIgnore  = ["advertisement", "sidebar", "comment"];
 
       function shouldIgnoreElement(element: Element): boolean {
-        if (elementsToIgnore.includes(element.tagName.toLowerCase()))
-          return true;
+        if (elementsToIgnore.includes(element.tagName.toLowerCase())) return true;
         if (element.closest(elementsToIgnore.join(","))) return true;
         for (const className of classesToIgnore) {
           if (element.classList.contains(className)) return true;
@@ -339,21 +333,20 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
 
       function truncateText(text: string, maxLength: number): string {
         return text.length > maxLength
-          ? text.slice(0, maxLength) + "..."
+          ? `${text.slice(0, maxLength)}...`
           : text;
       }
 
       function isContentEqual(
         a: Content,
         b: Content,
-        isLastTenIndexes: boolean
+        isLastTenIndexes: boolean,
       ): boolean {
         // return JSON.stringify(a) === JSON.stringify(b);
         if (a.type === "text" && b.type === "text" && isLastTenIndexes) {
           return a.content.includes(b.content);
-        } else {
-          return JSON.stringify(a) === JSON.stringify(b);
         }
+        return JSON.stringify(a) === JSON.stringify(b);
       }
 
       function addUniqueContent(content: Content) {
@@ -378,26 +371,26 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
             const visibleText = element.innerText.trim();
             if (visibleText) {
               content = {
-                type: "link",
-                text: truncateText(visibleText, 100),
-                url: element.href,
+                type : "link",
+                text : truncateText(visibleText, 100),
+                url  : element.href,
               };
             }
           } else if (element instanceof HTMLImageElement) {
             content = {
-              type: "image",
-              src: element.src,
-              alt: truncateText(element.alt || "No alt text provided", 100),
+              type : "image",
+              src  : element.src,
+              alt  : truncateText(element.alt || "No alt text provided", 100),
             };
           } else if (/^h[1-6]$/i.test(element.tagName)) {
             content = {
-              type: "heading",
-              level: parseInt(element.tagName.toLowerCase().charAt(1)),
-              content: truncateText(element.innerText.trim(), 200),
+              type    : "heading",
+              level   : parseInt(element.tagName.toLowerCase().charAt(1)),
+              content : truncateText(element.innerText.trim(), 200),
             };
           } else if (
-            element instanceof HTMLUListElement ||
-            element instanceof HTMLOListElement
+            element instanceof HTMLUListElement
+            || element instanceof HTMLOListElement
           ) {
             const items = Array.from(element.getElementsByTagName("li"))
               .map((li) => truncateText(li.innerText.trim(), 200))
@@ -405,37 +398,34 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
             if (items.length > 0) {
               content = {
                 type: "list",
-                items: items,
+                items,
               };
             }
           } else if (element instanceof HTMLTableElement) {
             const headers = Array.from(element.getElementsByTagName("th")).map(
-              (th) => truncateText(th.innerText.trim(), 100)
+              (th) => truncateText(th.innerText.trim(), 100),
             );
-            const rows = Array.from(element.getElementsByTagName("tr")).map(
-              (tr) =>
-                Array.from(tr.getElementsByTagName("td")).map((td) =>
-                  truncateText(td.innerText.trim(), 100)
-                )
+            const rows    = Array.from(element.getElementsByTagName("tr")).map(
+              (tr) => Array.from(tr.getElementsByTagName("td")).map((td) => truncateText(td.innerText.trim(), 100)),
             );
             if (headers.length > 0 || rows.length > 0) {
               content = {
                 type: "table",
-                headers: headers,
-                rows: rows,
+                headers,
+                rows,
               };
             }
           } else if (element instanceof HTMLQuoteElement) {
             content = {
-              type: "quote",
-              content: truncateText(element.innerText.trim(), 500),
+              type    : "quote",
+              content : truncateText(element.innerText.trim(), 500),
             };
           } else {
             const visibleText = element.innerText.trim();
             if (visibleText) {
               content = {
-                type: "text",
-                content: truncateText(visibleText, 1000),
+                type    : "text",
+                content : truncateText(visibleText, 1000),
               };
             }
           }
@@ -452,15 +442,15 @@ export async function extractContentsFromWeb(url: string): Promise<Content[]> {
 
       // Extract meta description
       const metaDescription = document.querySelector(
-        'meta[name="description"]'
+        'meta[name="description"]',
       );
       if (
-        metaDescription instanceof HTMLMetaElement &&
-        metaDescription.content
+        metaDescription instanceof HTMLMetaElement
+        && metaDescription.content
       ) {
         addUniqueContent({
-          type: "meta",
-          description: truncateText(metaDescription.content, 200),
+          type        : "meta",
+          description : truncateText(metaDescription.content, 200),
         });
       }
 

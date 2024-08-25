@@ -21,16 +21,16 @@ type PersistType = (
 const useTemplateStore = create<StoreType>(
   (persist as PersistType)(
     (set, get) => ({
-      templates: [],
-      selectedTemplate: null,
-      setSelectedTemplate: (template) => {
+      templates           : [],
+      selectedTemplate    : null,
+      setSelectedTemplate : (template) => {
         let selectedTemplate = null;
         if (template) {
           const { ignoreCache, ...restTemplate } = template || {};
-          selectedTemplate = { ...restTemplate };
+          selectedTemplate                       = { ...restTemplate };
         }
 
-        set({ selectedTemplate: selectedTemplate });
+        set({ selectedTemplate });
       },
       addTemplate: (template) => {
         const { ignoreCache, ...restTemplate } = template;
@@ -46,27 +46,25 @@ const useTemplateStore = create<StoreType>(
         const { ignoreCache, ...restTemplate } = template;
 
         set((state) => ({
-          templates: state.templates.map((t) =>
-            t.id === restTemplate.id
-              ? { ...restTemplate, updatedAt: new Date() }
-              : t
-          ),
+          templates: state.templates.map((t) => (t.id === restTemplate.id
+            ? { ...restTemplate, updatedAt: new Date() }
+            : t)),
         }));
       },
       deleteTemplate: (template) => {
-        const selectedTemplate = get().selectedTemplate;
-        const isSelectedTemplate = template.id === selectedTemplate?.id;
+        const { selectedTemplate } = get();
+        const isSelectedTemplate   = template.id === selectedTemplate?.id;
 
         set((state) => ({
-          templates: state.templates.filter((t) => t.id !== template.id),
-          selectedTemplate: isSelectedTemplate ? null : selectedTemplate,
+          templates        : state.templates.filter((t) => t.id !== template.id),
+          selectedTemplate : isSelectedTemplate ? null : selectedTemplate,
         }));
       },
     }),
     {
       name: LOCAL_STORAGE_TEMPLATES_KEY, // unique name
-    }
-  )
+    },
+  ),
 );
 
 export { useTemplateStore };

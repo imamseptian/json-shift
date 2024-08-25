@@ -17,9 +17,9 @@ export function ThemeToggler({ className }: { className?: string }) {
 
   return (
     <Button
-      onClick={toggleTheme}
-      variant={"ghost"}
-      className={cn("aspect-square p-0", className)}
+      onClick={ toggleTheme }
+      variant="ghost"
+      className={ cn("aspect-square p-0", className) }
     >
       <Sun className="hidden dark:block w-5 h-5" />
       <Moon className="dark:hidden w-5 h-5 " />

@@ -13,16 +13,14 @@ type SupportedModel =
  * Mapping of providers to their respective model creation functions
  */
 const MODEL_CREATORS = {
-  groq: (model: string) =>
-    new ChatGroq({
-      apiKey: env.GROQ_API_KEY,
-      modelName: model,
-    }),
-  gemini: (model: string) =>
-    new ChatGoogleGenerativeAI({
-      apiKey: env.GOOGLE_AI_STUDIO_API_KEY,
-      modelName: model,
-    }),
+  groq: (model: string) => new ChatGroq({
+    apiKey    : env.GROQ_API_KEY,
+    modelName : model,
+  }),
+  gemini: (model: string) => new ChatGoogleGenerativeAI({
+    apiKey    : env.GOOGLE_AI_STUDIO_API_KEY,
+    modelName : model,
+  }),
 };
 
 /**
@@ -33,9 +31,7 @@ const MODEL_CREATORS = {
  * @throws Error if the model provider is unknown
  */
 export function getModel(model: SupportedModel) {
-  const provider = Object.entries(LLM_MODEL_OPTIONS).find(([, models]) =>
-    models.includes(model)
-  )?.[0] as keyof typeof MODEL_CREATORS | undefined;
+  const provider = Object.entries(LLM_MODEL_OPTIONS).find(([, models]) => models.includes(model))?.[0] as keyof typeof MODEL_CREATORS | undefined;
 
   if (!provider || !(provider in MODEL_CREATORS)) {
     throw new Error(`Unknown model provider for model: ${model}`);

@@ -11,8 +11,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "JsonShift",
-    template: "%s | JsonShift",
+    default  : "JsonShift",
+    template : "%s | JsonShift",
   },
   description:
     "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
@@ -26,64 +26,64 @@ export const metadata: Metadata = {
     "JSON generation",
     "web data to JSON",
   ],
-  authors: [{ name: "Imam Septian" }],
-  creator: "Imam Septian",
-  themeColor: [
+  authors    : [{ name: "Imam Septian" }],
+  creator    : "Imam Septian",
+  themeColor : [
     { media: "(prefers-color-scheme: dark)", color: "black" },
     { media: "(prefers-color-scheme: light)", color: "white" },
   ],
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: env.BASE_URL,
-    siteName: "JsonShift",
-    title: "JsonShift",
+    type     : "website",
+    locale   : "en_US",
+    url      : env.BASE_URL,
+    siteName : "JsonShift",
+    title    : "JsonShift",
     description:
       "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
     images: [
       {
-        url: `${env.BASE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "JsonShift - Document to JSON",
+        url    : `${env.BASE_URL}/og-image.png`,
+        width  : 1200,
+        height : 630,
+        alt    : "JsonShift - Document to JSON",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    site: "@yourTwitterHandle",
-    title: "JsonShift",
+    card  : "summary_large_image",
+    site  : "@yourTwitterHandle",
+    title : "JsonShift",
     description:
       "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
     images: [
       {
-        url: `${env.BASE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "JsonShift - Document to JSON",
+        url    : `${env.BASE_URL}/og-image.png`,
+        width  : 1200,
+        height : 630,
+        alt    : "JsonShift - Document to JSON",
       },
     ],
   },
   robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+    index     : true,
+    follow    : true,
+    googleBot : {
+      index               : true,
+      follow              : true,
+      "max-video-preview" : -1,
+      "max-image-preview" : "large",
+      "max-snippet"       : -1,
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon     : "/favicon.ico",
+    shortcut : "/favicon-16x16.png",
+    apple    : "/apple-touch-icon.png",
   },
   alternates: {
     languages: {
-      "en-US": "/en-US",
-      "es-ES": "/es-ES",
+      "en-US" : "/en-US",
+      "es-ES" : "/es-ES",
     },
   },
 };
@@ -96,7 +96,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn("bg-background font-sans antialiased", inter.className)}
+        className={ cn("bg-background font-sans antialiased", inter.className) }
       >
         <ThemeProvider
           attribute="class"
@@ -106,7 +106,7 @@ export default function RootLayout({
         >
           <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-grow container mx-auto py-4">{children}</main>
+            <main className="flex-grow container mx-auto py-4">{ children }</main>
             <Footer />
           </div>
         </ThemeProvider>

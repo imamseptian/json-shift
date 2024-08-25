@@ -41,29 +41,29 @@ export default function SelectField({
 
   return (
     <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel>{label || name}</FormLabel>
+      control={ control }
+      name={ name }
+      render={ ({ field }) => (
+        <FormItem className={ className }>
+          <FormLabel>{ label || name }</FormLabel>
           <FormControl>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={ field.onChange } defaultValue={ field.value }>
               <SelectTrigger className="capitalize">
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
-                {options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                { options.map((option) => (
+                  <SelectItem key={ option.value } value={ option.value }>
+                    { option.label }
                   </SelectItem>
-                ))}
+                )) }
               </SelectContent>
             </Select>
           </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
+          { description && <FormDescription>{ description }</FormDescription> }
           <FormMessage />
         </FormItem>
-      )}
+      ) }
     />
   );
 }

@@ -14,7 +14,7 @@ import {
 } from "./ui/accordion";
 
 const PRIMITIVE_TYPES = TYPES.filter(
-  (type) => !["array", "object"].includes(type.value)
+  (type) => !["array", "object"].includes(type.value),
 );
 
 export default function PropertyObjectField({
@@ -24,14 +24,14 @@ export default function PropertyObjectField({
   index: number;
   isArray?: boolean;
 }) {
-  const { watch, setValue, control } = useFormContext<Template>();
+  const { watch, control } = useFormContext<Template>();
 
   const [openProperties, setOpenProperties] = useState<string[]>([]);
 
   const currentAttribute = watch(`attributes.${index}`);
 
   const currentObjectField = watch(
-    isArray ? `attributes.${index}.items` : `attributes.${index}`
+    isArray ? `attributes.${index}.items` : `attributes.${index}`,
   ) as ObjectAttribute;
 
   const { remove, append } = useFieldArray({
@@ -46,9 +46,9 @@ export default function PropertyObjectField({
   const handleAddPropertiesAttribute = () => {
     const newIndex = currentProperties.length;
     append({
-      name: "",
-      type: "string",
-      description: "",
+      name        : "",
+      type        : "string",
+      description : "",
     });
     setOpenProperties((prev) => [...prev, `property-field-${newIndex}`]);
   };
@@ -61,25 +61,25 @@ export default function PropertyObjectField({
       <Accordion
         type="multiple"
         className="space-y-4"
-        value={openProperties}
-        onValueChange={setOpenProperties}
+        value={ openProperties }
+        onValueChange={ setOpenProperties }
       >
-        {currentProperties.map((property, secondIndex) => (
+        { currentProperties.map((property, secondIndex) => (
           <AccordionItem
-            value={`property-field-${secondIndex}`}
+            value={ `property-field-${secondIndex}` }
             className="bg-background border border-accent"
-            key={`property-field-${secondIndex}`}
+            key={ `property-field-${secondIndex}` }
           >
             <AccordionTrigger
               className="px-4 flex justify-between items-center rounded-t-md"
-              onCloseClick={() => remove(index)}
+              onCloseClick={ () => remove(index) }
             >
               <h3 className="font-bold text-lg w-full text-start">
-                {property.name
+                { property.name
                   ? `${currentAttribute.name}.${property.name}`
-                  : `Object Property ${secondIndex + 1}`}
+                  : `Object Property ${secondIndex + 1}` }
               </h3>
-              <span className="mx-5 capitalize">{property.type}</span>
+              <span className="mx-5 capitalize">{ property.type }</span>
             </AccordionTrigger>
             <AccordionContent className="p-4">
               <div className="flex gap-4 mb-5">
@@ -100,7 +100,7 @@ export default function PropertyObjectField({
                       : `attributes.${index}.properties.${secondIndex}.type`
                   }
                   label="Type"
-                  options={PRIMITIVE_TYPES}
+                  options={ PRIMITIVE_TYPES }
                   className="basis-1/2"
                 />
               </div>
@@ -115,12 +115,12 @@ export default function PropertyObjectField({
               />
             </AccordionContent>
           </AccordionItem>
-        ))}
+        )) }
         <Button
           type="button"
-          variant={"success"}
+          variant="success"
           className="w-full mt-5"
-          onClick={handleAddPropertiesAttribute}
+          onClick={ handleAddPropertiesAttribute }
         >
           <PlusCircle className="w-4 h-4 mr-2" />
           Add Object Property

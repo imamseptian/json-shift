@@ -1,32 +1,5 @@
 import { MAX_CONTEXT_LENGTH } from "./constants";
 
-export function safeJSONParse(jsonString: string) {
-  try {
-    // First, try to parse the JSON as-is
-    return JSON.parse(jsonString);
-  } catch (error) {
-    // If parsing fails, try to fix common issues
-    try {
-      // Replace escaped backslashes before quotes
-      const fixedString = jsonString.replace(/\\"/g, '"');
-
-      // Replace single backslashes that aren't followed by valid escape characters
-      const validEscapes = ["b", "f", "n", "r", "t", '"', "\\", "/"];
-      const furtherFixedString = fixedString.replace(
-        /\\([^bfnrt"\\\/])/g,
-        "$1"
-      );
-
-      // Try parsing again
-      return JSON.parse(furtherFixedString);
-    } catch (secondError) {
-      // If it still fails, throw an error or handle it as needed
-      console.error("Failed to parse JSON:", secondError);
-      return null; // or throw new Error("Invalid JSON")
-    }
-  }
-}
-
 /**
  * Truncate string to prevent exceeding LLM token limit
  * @param {string} str - The input string to truncate

@@ -24,26 +24,26 @@ export default function ModelSelect() {
 
   return (
     <Select
-      onValueChange={onModelChange}
-      defaultValue={DEFAULT_LLM_MODEL}
-      value={selectedModel}
+      onValueChange={ onModelChange }
+      defaultValue={ DEFAULT_LLM_MODEL }
+      value={ selectedModel }
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Models" />
       </SelectTrigger>
       <SelectContent>
-        {Object.entries(LLM_MODEL_OPTIONS).map(([provider, models]) => (
-          <React.Fragment key={provider}>
+        { Object.entries(LLM_MODEL_OPTIONS).map(([provider, models]) => (
+          <React.Fragment key={ provider }>
             <SelectItem value="group-1" disabled className="font-bold">
-              {provider}
+              { provider }
             </SelectItem>
-            {models.map((model) => (
-              <SelectItem key={`llm-model-option-${model}`} value={model}>
-                {model}
+            { models.map((model) => (
+              <SelectItem key={ `llm-model-option-${model}` } value={ model }>
+                { model }
               </SelectItem>
-            ))}
+            )) }
           </React.Fragment>
-        ))}
+        )) }
       </SelectContent>
     </Select>
   );

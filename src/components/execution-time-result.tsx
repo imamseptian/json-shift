@@ -10,21 +10,27 @@ export function ExecutionTimeResult({
 }) {
   return (
     <div>
-      {executionTime?.scrapeExecutionTime && (
+      { executionTime?.scrapeExecutionTime && (
         <p className="text-sm font-bold">
-          Scrape Execution Time: {executionTime.scrapeExecutionTime}
+          Scrape Execution Time:
+          { ' ' }
+          { executionTime.scrapeExecutionTime }
         </p>
-      )}
-      {executionTime?.embeddingTime && (
+      ) }
+      { executionTime?.embeddingTime && (
         <p className="text-sm font-bold">
-          Embedding Execution Time: {executionTime.embeddingTime}
+          Embedding Execution Time:
+          { ' ' }
+          { executionTime.embeddingTime }
         </p>
-      )}
-      {executionTime?.llmProcessingTime && (
+      ) }
+      { executionTime?.llmProcessingTime && (
         <p className="text-sm font-bold">
-          LLM Processing Time: {executionTime.llmProcessingTime}
+          LLM Processing Time:
+          { ' ' }
+          { executionTime.llmProcessingTime }
         </p>
-      )}
+      ) }
     </div>
   );
 }

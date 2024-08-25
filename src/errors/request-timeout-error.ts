@@ -3,6 +3,7 @@
  */
 export default class RequestTimeoutError extends Error {
   code: string;
+
   /**
    * @param {string} message - The error message
    */

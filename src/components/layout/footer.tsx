@@ -9,7 +9,11 @@ export default function Footer() {
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="w-full md:w-auto">
             <p className="text-sm">
-              © {new Date().getFullYear()} Razhael™. All Rights Reserved.
+              ©
+              { ' ' }
+              { new Date().getFullYear() }
+              { ' ' }
+              Razhael™. All Rights Reserved.
             </p>
           </div>
           <div className="flex mt-4 sm:justify-center sm:mt-0">

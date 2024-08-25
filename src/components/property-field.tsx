@@ -9,11 +9,11 @@ export default function PropertiesField({ index }: { index: number }) {
   const currentAttribute = watch(`attributes.${index}`);
 
   if (currentAttribute.type === "object") {
-    return <PropertyObjectField index={index} />;
+    return <PropertyObjectField index={ index } />;
   }
 
   if (currentAttribute.type === "array") {
-    return <PropertyItemsField index={index} />;
+    return <PropertyItemsField index={ index } />;
   }
 
   return null;

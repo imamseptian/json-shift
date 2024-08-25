@@ -31,13 +31,14 @@ export const extractController = {
     const scrapeStartTime = Date.now();
 
     try {
-      const { scrapeExecutionTime, embeddingTime, context, storedDocumentIds } =
-        await getContext({ ignoreCache: ignoreCache as boolean, ...template });
+      const {
+        scrapeExecutionTime, embeddingTime, context, storedDocumentIds,
+      } =        await getContext({ ignoreCache: ignoreCache as boolean, ...template });
 
       const llmProcessingStartTime = Date.now();
-      const chain = setupLangChain(template.attributes, model);
-      const answer = await chain.invoke({ context });
-      const llmProcessingTime = measureExecutionTime(llmProcessingStartTime);
+      const chain                  = setupLangChain(template.attributes, model);
+      const answer                 = await chain.invoke({ context });
+      const llmProcessingTime      = measureExecutionTime(llmProcessingStartTime);
 
       await deleteStoredDocuments(storedDocumentIds);
 
@@ -50,15 +51,15 @@ export const extractController = {
         storedDocumentIds,
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error in extractHandler:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "An unexpected error occurred";
+      const errorMessage =        error instanceof Error ? error.message : "An unexpected error occurred";
       return c.json(
         {
-          error: errorMessage,
-          processingTime: measureExecutionTime(scrapeStartTime),
+          error          : errorMessage,
+          processingTime : measureExecutionTime(scrapeStartTime),
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   },

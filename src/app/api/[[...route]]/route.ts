@@ -22,24 +22,22 @@ const app = new Hono().basePath("/api");
 app.use(
   "/api/*",
   cors({
-    origin: env.NODE_ENV === "production" ? env.BASE_URL : "*",
-    allowMethods: ["POST", "GET", "OPTIONS"],
-    maxAge: 600,
-    credentials: true,
-  })
+    origin       : env.NODE_ENV === "production" ? env.BASE_URL : "*",
+    allowMethods : ["POST", "GET", "OPTIONS"],
+    maxAge       : 600,
+    credentials  : true,
+  }),
 );
 
-const errorResponse = (c: Context, status: StatusCode, error: any) => {
-  return c.json(
-    {
-      code: error?.code || "INTERNAL_SERVER_ERROR",
-      title: error.name.replace(/([A-Z])/g, " $1").trim(),
-      message: error.message,
-      details: error.details,
-    },
-    status
-  );
-};
+const errorResponse = (c: Context, status: StatusCode, error: any) => c.json(
+  {
+    code    : error?.code || "INTERNAL_SERVER_ERROR",
+    title   : error.name.replace(/([A-Z])/g, " $1").trim(),
+    message : error.message,
+    details : error.details,
+  },
+  status,
+);
 
 /**
  * Global error handler

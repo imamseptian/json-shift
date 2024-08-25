@@ -1,0 +1,4 @@
+src/components/ui/
+
+next.config.mjs
+src/lib/web-scraper.ts
