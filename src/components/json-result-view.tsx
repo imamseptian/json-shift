@@ -47,7 +47,7 @@ function JsonResultView({ objectResult }: { objectResult: any }) {
   };
 
   return (
-    <div className="">
+    <div className="w-full px-3">
       <div className="flex space-x-2 justify-end mb-3">
         <button
           type="button"
@@ -64,7 +64,7 @@ function JsonResultView({ objectResult }: { objectResult: any }) {
           Download JSON
         </button>
       </div>
-      <JsonView value={ objectResult } style={ monokaiTheme } />
+      <JsonView value={ objectResult } style={ monokaiTheme } className="w-full max-w-screen overflow-x-auto" />
     </div>
   );
 }

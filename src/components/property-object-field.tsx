@@ -79,7 +79,7 @@ export default function PropertyObjectField({
                   ? `${currentAttribute.name}.${property.name}`
                   : `Object Property ${secondIndex + 1}` }
               </h3>
-              <span className="mx-5 capitalize">{ property.type }</span>
+              <span className="mx-5 capitalize hidden md:block">{ property.type }</span>
             </AccordionTrigger>
             <AccordionContent className="p-4">
               <div className="flex gap-4 mb-5">

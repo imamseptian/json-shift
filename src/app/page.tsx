@@ -10,7 +10,7 @@ import { applyValidationErrorsToForm } from "@/lib/error-utils";
 import { Template } from "@/schemas/template-schema";
 import { useModelStore } from "@/store/model-store";
 import { useTemplateStore } from "@/store/template-store";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
@@ -37,6 +37,14 @@ export default function Homepage() {
     embeddingTime       : null,
     llmProcessingTime   : null,
   });
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      setObjectResult(selectedTemplate?.latestResult ?? null);
+    } else {
+      setObjectResult(null);
+    }
+  }, [selectedTemplate]);
 
   const onSubmit = async (formValues: Template, form: UseFormReturn<Template>) => {
     if (resultRef.current) {
@@ -117,6 +125,9 @@ export default function Homepage() {
       });
     } finally {
       setIsSubmitting(false);
+      if (resultRef.current) {
+        resultRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 

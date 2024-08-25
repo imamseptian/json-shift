@@ -70,6 +70,34 @@ export default function TemplateForm(
         className="space-y-6"
       >
         <TemplateInfoCard />
+        <div className="flex p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+          <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+          </svg>
+          <span className="sr-only">Info</span>
+          <div>
+            <span className="font-medium">Warning alert!</span>
+            { ' ' }
+            This website is still in development and may experience some limitations. Please note the following:
+            <ul className="list-disc list-outside mt-3">
+              <li>
+                <b>Processing Time:</b>
+                { ' ' }
+                It might take longer to process requests, especially if the targeted website has extensive content.
+              </li>
+              <li>
+                <b>Content Length:</b>
+                { ' ' }
+                Very long content from a website can cause difficulties in processing due to token limitations in the language model.
+              </li>
+              <li>
+                <b>Anti-Scraping Security:</b>
+                { ' ' }
+                Some websites have security measures that may prevent us from extracting information.
+              </li>
+            </ul>
+          </div>
+        </div>
         <AttributesCard />
         <IgnoreCacheCheckbox control={ control } />
         <Button type="submit" className="w-full" disabled={ isSubmitting }>

@@ -52,13 +52,13 @@ export default function AttributeFields() {
             className="bg-secondary border-2 border-primary"
           >
             <AccordionTrigger
-              className="px-4 flex justify-between items-center bg-secondary text-secondary-foreground rounded-t-md"
+              className="px-4 flex justify-between items-center bg-secondary text-secondary-foreground rounded-t-md w-full overflow-hidden"
               onCloseClick={ () => remove(index) }
             >
-              <h3 className="font-bold text-lg w-full text-start">
+              <h3 className="font-bold text-lg w-full text-start overflow-hidden">
                 { attribute.name || `Attribute ${index + 1}` }
               </h3>
-              <span className="mx-5 capitalize">{ attribute.type }</span>
+              <span className="mx-5 capitalize hidden md:block">{ attribute.type }</span>
             </AccordionTrigger>
             <AccordionContent className="p-4 bg-muted text-muted-foreground">
               <div className="flex gap-4 mb-5">
