@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Linkedin } from "lucide-react";
+import { Globe, Linkedin } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
@@ -93,6 +93,17 @@ export default function Footer() {
                 className="text-secondary-foreground hover:opacity-80 ms-5"
               >
                 <Linkedin className="w-4 h-4" />
+                <span className="sr-only">Linkedin</span>
+              </Link>
+            </Button>
+            <Button variant="link" asChild>
+              <Link
+                href="https://www.imamseptian.site"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-secondary-foreground hover:opacity-80 ms-5"
+              >
+                <Globe className="w-4 h-4" />
                 <span className="sr-only">Linkedin</span>
               </Link>
             </Button>
