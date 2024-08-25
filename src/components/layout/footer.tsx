@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-secondary text-secondary-foreground">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div className="sm:flex sm:items-center sm:justify-between">
-          <div className="w-full md:w-auto">
+          <div className="w-full md:w-auto text-center">
             <p className="text-sm">
               ©
               { ' ' }
@@ -16,7 +16,7 @@ export default function Footer() {
               Razhael™. All Rights Reserved.
             </p>
           </div>
-          <div className="flex mt-4 sm:justify-center sm:mt-0">
+          <div className="flex mt-4 justify-center sm:mt-0 items-center">
             <Button variant="link" asChild>
               <Link
                 href="https://www.facebook.com/imamseptian.wijaya"
