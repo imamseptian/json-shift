@@ -11,13 +11,22 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default  : "JsonShift",
+    default  : "JsonShift | AI-Powered Web Data Extraction to JSON",
     template : "%s | JsonShift",
   },
   description:
-    "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
+    "JsonShift utilizes scraping, embedding , and LLM technologies to extract and convert web content into structured JSON format based on user inputs. Simplify data extraction with our powerful tools.",
   keywords: [
     "JSON",
+    "data extraction",
+    "AI-powered data extraction",
+    "web scraping",
+    "groq",
+    "gemini",
+    "cohere",
+    "embedding",
+    "scraper",
+    'langchain',
     "jsonshift",
     "data extraction",
     "web content to JSON",
@@ -25,9 +34,11 @@ export const metadata: Metadata = {
     "website data extraction",
     "JSON generation",
     "web data to JSON",
+    "structured data",
+    "data transformation",
   ],
-  authors    : [{ name: "Imam Septian" }],
-  creator    : "Imam Septian",
+  authors    : [{ name: "Imam Septian Adi Wijaya" }],
+  creator    : "Imam Septian Adi Wijaya",
   themeColor : [
     { media: "(prefers-color-scheme: dark)", color: "black" },
     { media: "(prefers-color-scheme: light)", color: "white" },
@@ -37,30 +48,30 @@ export const metadata: Metadata = {
     locale   : "en_US",
     url      : env.BASE_URL,
     siteName : "JsonShift",
-    title    : "JsonShift",
+    title    : "JsonShift | AI-Powered Web Data Extraction to JSON",
     description:
-      "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
+      "Experience the power of AI and advanced scraping with JsonShift to transform web content into customizable JSON outputs. Efficiently extract data tailored to your needs.",
     images: [
       {
         url    : `${env.BASE_URL}/og-image.png`,
         width  : 1200,
         height : 630,
-        alt    : "JsonShift - Document to JSON",
+        alt    : "JsonShift - AI-Powered Data Extraction",
       },
     ],
   },
   twitter: {
     card  : "summary_large_image",
     site  : "@yourTwitterHandle",
-    title : "JsonShift",
+    title : "JsonShift | AI-Powered Web Data Extraction to JSON",
     description:
-      "Transform document into structured JSON data with JsonShift. Our AI-powered web service extracts and organizes information from a document.",
+      "Transform web content into structured JSON outputs with JsonShift's AI-powered tools. Extract data quickly and accurately based on user-defined inputs.",
     images: [
       {
         url    : `${env.BASE_URL}/og-image.png`,
         width  : 1200,
         height : 630,
-        alt    : "JsonShift - Document to JSON",
+        alt    : "JsonShift - AI-Powered Data Extraction",
       },
     ],
   },
