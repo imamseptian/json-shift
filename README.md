@@ -4,6 +4,18 @@ JSON-Shift is a tool designed to simplify web scraping and information extractio
 
 To extract information that requested by user, this project utilizing:
 
+## Table of Contents
+
+- [Key Features](#keyfeatures)
+- [Setup Project](#setup-project)
+- [How This Works](#how-this-works)
+- [Usage Examples](#usage-examples)
+  - [Extract array of mangas object from manga reading website](#extract-array-of-mangas-object-from-manga-reading-website)
+  - [Extract Person Information from Wiki](#extract-person-information-from-wiki)
+  - [Extract Indonesian News](#extract-indonesian-news)
+- [Technologies Used](#technologies-used)
+- [License](#license)
+
 ## KeyFeatures
 
 - Web scraping using Puppeteer
@@ -11,6 +23,8 @@ To extract information that requested by user, this project utilizing:
 - Large Language Model integration (currently using Gemini and Groq free plans)
 - Intelligent content filtering
 - Vector store for efficient similarity search
+- Langchain to integrate data/context to Large Language Model
+- Gemini and Groq LLM
 - Customizable JSON output
 
 ## Setup Project
@@ -400,6 +414,7 @@ bun dev
 
 - Web Scraping: Puppeteer
 - Embedding: Cohere
+- Langchain
 - LLM: Gemini, Groq
 - Vector Store: Upstash
 - Development: TypeScript, Bun
