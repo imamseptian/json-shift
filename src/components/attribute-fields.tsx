@@ -15,8 +15,8 @@ import {
 } from "./ui/accordion";
 
 export default function AttributeFields() {
-  const { control }               = useFormContext<Template>();
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const { control, formState: { errors } } = useFormContext<Template>();
+  const [openItems, setOpenItems]          = useState<string[]>([]);
 
   const {
     fields: attributes,
@@ -90,11 +90,16 @@ export default function AttributeFields() {
         type="button"
         variant="outline"
         onClick={ handleAddAttribute }
-        className="w-full mt-4"
+        className={ `w-full mt-4 ${errors.attributes && 'border-4 border-destructive'}` }
       >
         <PlusCircle className="mr-2 h-4 w-4" />
         Add Field
       </Button>
+      {
+        errors.attributes && (
+          <p className="text-sm font-medium text-destructive dark:text-destructive-foreground mt-3">{ errors.attributes.message }</p>
+        )
+      }
     </div>
   );
 }

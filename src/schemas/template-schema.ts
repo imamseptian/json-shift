@@ -97,8 +97,8 @@ export const AttributeSchema = z.discriminatedUnion("type", [
 export const TemplateSchema = z.object({
   id           : z.string().optional(),
   url          : z.string().url(),
-  name         : z.string().min(5, "Cannot be empty"),
-  attributes   : z.array(AttributeSchema).min(1, "Cannot be empty"),
+  name         : z.string().min(1, "Cannot be empty"),
+  attributes   : z.array(AttributeSchema).min(1, "Please input at least one attribute"),
   latestResult : z.any().optional(),
   createdAt    : z.union([z.date(), z.string()]).optional(),
   updatedAt    : z.union([z.string(), z.date()]).optional(),
