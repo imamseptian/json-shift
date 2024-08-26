@@ -2,8 +2,6 @@
 
 JSON-Shift is a tool designed to simplify web scraping and information extraction. It transforms website content into structured JSON format based on user-defined attributes.
 
-To extract information that requested by user, this project utilizing:
-
 ## Table of Contents
 
 - [Key Features](#keyfeatures)
@@ -17,6 +15,8 @@ To extract information that requested by user, this project utilizing:
 - [License](#license)
 
 ## KeyFeatures
+
+To extract information that requested by user, this project utilizing:
 
 - Web scraping using Puppeteer
 - Embedding with Cohere
