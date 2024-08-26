@@ -1,25 +1,27 @@
 'use client';
 
-import BrowseTemplate from "@/components/browse-template";
-import { ExecutionTime, ExecutionTimeResult } from "@/components/execution-time-result";
-import JsonResultView from "@/components/json-result-view";
-import { Skeleton } from "@/components/skeleton";
-import TemplateForm from "@/components/template-form";
-import { Button } from "@/components/ui/button";
-import { applyValidationErrorsToForm } from "@/lib/error-utils";
-import { Template } from "@/schemas/template-schema";
-import { useModelStore } from "@/store/model-store";
-import { useTemplateStore } from "@/store/template-store";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect, useRef, useState,
+} from "react";
 import { UseFormReturn } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
-interface ErrorObject {
-  title: string;
-  message: string;
-}
+import BrowseTemplate from "@/components/browse-template";
+import { ExecutionTime } from "@/components/execution-time-result";
+import ResultSection from "@/components/result-section";
+import TemplateForm from "@/components/template-form";
+import { Button } from "@/components/ui/button";
+import { applyValidationErrorsToForm } from "@/lib/error-utils";
+import { ErrorObject } from "@/lib/types";
+import { Template } from "@/schemas/template-schema";
+import { useModelStore } from "@/store/model-store";
+import { useTemplateStore } from "@/store/template-store";
 
-export default function Homepage() {
+/**
+ * Homepage component for template management and execution
+ * @returns {JSX.Element} The rendered Homepage component
+ */
+export default function Homepage(): JSX.Element {
   const {
     selectedTemplate,
     setSelectedTemplate,
@@ -39,29 +41,24 @@ export default function Homepage() {
   });
 
   useEffect(() => {
-    if (selectedTemplate) {
-      setObjectResult(selectedTemplate?.latestResult ?? null);
-    } else {
-      setObjectResult(null);
-    }
+    setObjectResult(selectedTemplate?.latestResult ?? null);
   }, [selectedTemplate]);
 
-  const onSubmit = async (formValues: Template, form: UseFormReturn<Template>) => {
+  /**
+   * Handles form submission and API interaction
+   * @param {Template} formValues - The form values to be submitted
+   * @param {UseFormReturn<Template>} form - The form instance
+   */
+  const handleSubmit = async (formValues: Template, form: UseFormReturn<Template>) => {
     if (resultRef.current) {
       resultRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
-    const { formState: { isSubmitting: isFormSubmitting } } = form;
-
-    setIsSubmitting(isFormSubmitting);
-
-    let templateUuid = formValues.id;
-    if (!templateUuid) {
-      templateUuid = uuid();
-    }
-
+    setIsSubmitting(true);
     setErrorObject(null);
     setObjectResult(null);
+
+    const templateId = formValues.id || uuid();
 
     try {
       const response = await fetch("/api/extract", {
@@ -70,65 +67,100 @@ export default function Homepage() {
         body    : JSON.stringify({
           ...formValues,
           model : selectedModel,
-          id    : templateUuid,
+          id    : templateId,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 422 && data.code === "VALIDATION_ERROR") {
-          // Handle Zod validation error
-          applyValidationErrorsToForm(data.details, form.setError);
-          setErrorObject({
-            title: data?.title ?? "Validation Error",
-            message:
-              data?.message ?? "Validation failed. Please check your inputs.",
-          });
-        } else {
-          setErrorObject({
-            title   : data?.title ?? "Unknown error",
-            message : data?.message ?? "Unknown error",
-          });
-        }
+        handleErrorResponse(response, data, form);
       } else {
-        setObjectResult(data.answer);
+        handleSuccessResponse(data, formValues, templateId);
       }
 
-      if (response.ok) {
-        if (formValues.id) {
-          const updatedTemplate = {
-            ...formValues,
-            latestResult: data?.answer ?? null,
-          };
-          updateTemplate(updatedTemplate);
-          setSelectedTemplate(updatedTemplate);
-        } else {
-          const newTemplate = {
-            ...formValues,
-            latestResult : data?.answer ?? null,
-            id           : templateUuid,
-          };
-          addTemplate(newTemplate);
-          setSelectedTemplate(newTemplate);
-        }
-      }
-
-      setExecutionTime({
-        scrapeExecutionTime : data?.scrapeExecutionTime ?? null,
-        embeddingTime       : data?.embeddingTime ?? null,
-        llmProcessingTime   : data?.llmProcessingTime ?? null,
-      });
+      updateExecutionTime(data);
     } catch (error) {
-      setErrorObject({
-        title   : (error as Error).name ?? "Internal server error",
-        message : (error as Error).message ?? "Please try again later",
-      });
+      handleFetchError(error as Error);
     } finally {
       setIsSubmitting(false);
-      if (resultRef.current) {
-        resultRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+      scrollToResult();
+    }
+  };
+
+  /**
+   * Handles error responses from the API
+   * @param {Response} response - The API response
+   * @param {any} data - The parsed response data
+   * @param {UseFormReturn<Template>} form - The form instance
+   */
+  const handleErrorResponse = (response: Response, data: any, form: UseFormReturn<Template>) => {
+    if (response.status === 422 && data.code === "VALIDATION_ERROR") {
+      applyValidationErrorsToForm(data.details, form.setError);
+      setErrorObject({
+        title   : data?.title ?? "Validation Error",
+        message : data?.message ?? "Validation failed. Please check your inputs.",
+      });
+    } else {
+      setErrorObject({
+        title   : data?.title ?? "Unknown error",
+        message : data?.message ?? "Unknown error",
+      });
+    }
+  };
+
+  /**
+   * Handles successful responses from the API
+   * @param {any} data - The parsed response data
+   * @param {Template} formValues - The submitted form values
+   * @param {string} templateId - The template ID
+   */
+  const handleSuccessResponse = (data: any, formValues: Template, templateId: string) => {
+    setObjectResult(data.answer);
+
+    const updatedTemplate = {
+      ...formValues,
+      latestResult : data?.answer ?? null,
+      id           : templateId,
+    };
+
+    if (formValues.id) {
+      updateTemplate(updatedTemplate);
+    } else {
+      addTemplate(updatedTemplate);
+    }
+    setSelectedTemplate(updatedTemplate);
+  };
+
+  /**
+   * Updates the execution time state
+   * @param {any} data - The parsed response data containing execution times
+   */
+  const updateExecutionTime = (data: any) => {
+    setExecutionTime({
+      scrapeExecutionTime : data?.scrapeExecutionTime ?? null,
+      embeddingTime       : data?.embeddingTime ?? null,
+      llmProcessingTime   : data?.llmProcessingTime ?? null,
+    });
+  };
+
+  /**
+   * Handles errors that occur during the fetch operation
+   * @param {Error} error - The error object
+   */
+  const handleFetchError = (error: Error) => {
+    setErrorObject({
+      title   : error.name ?? "Internal server error",
+      message : error.message ?? "Please try again later",
+    });
+  };
+
+  /**
+   * Scrolls to the result section
+   */
+  const scrollToResult = () => {
+    if (resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -136,26 +168,25 @@ export default function Homepage() {
   const showResults      = !isSubmitting && !showErrorMessage;
 
   return (
-    <div>
-
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="basis-1/2 h-fit">
-          <div className="flex justify-between mb-5">
-            <BrowseTemplate />
-            { selectedTemplate?.id && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={ () => setSelectedTemplate(null) }
-              >
-                Create New
-              </Button>
-            ) }
-          </div>
-          <TemplateForm template={ selectedTemplate } onFormSubmit={ onSubmit } />
+    <div className="flex flex-col sm:flex-row gap-4">
+      <div className="basis-1/2 h-fit">
+        <div className="flex justify-between mb-5">
+          <BrowseTemplate />
+          { selectedTemplate?.id && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={ () => setSelectedTemplate(null) }
+            >
+              Create New
+            </Button>
+          ) }
         </div>
+        <TemplateForm template={ selectedTemplate } onFormSubmit={ handleSubmit } />
+      </div>
+      <div className="basis-1/2 ">
         <ResultSection
-          resultRef={ resultRef }
+          ref={ resultRef }
           isSubmitting={ isSubmitting }
           showErrorMessage={ showErrorMessage }
           error={ errorObject }
@@ -164,47 +195,7 @@ export default function Homepage() {
           executionTime={ executionTime }
         />
       </div>
-    </div>
 
-  );
-}
-
-function ResultSection({
-  resultRef,
-  isSubmitting,
-  showErrorMessage,
-  error,
-  showResults,
-  objectResult,
-  executionTime,
-}: {
-  resultRef: React.RefObject<HTMLDivElement>;
-  isSubmitting: boolean;
-  showErrorMessage: boolean;
-  error: ErrorObject | null;
-  showResults: boolean;
-  objectResult: any;
-  executionTime: ExecutionTime;
-}) {
-  return (
-    <div ref={ resultRef } className="basis-1/2">
-      { isSubmitting && (
-        <Skeleton className="w-full h-64 bg-[#272822] text-[#f8f8f2]" />
-      ) }
-      { showErrorMessage && (
-        <div className="w-full flex justify-center items-center min-h-[400px] bg-[#272822] text-[#f8f8f2] font-bold rounded-lg p-6 shadow-md">
-          <div className="text-center">
-            <h2 className="text-xl mb-2">{ error?.title }</h2>
-            <p>{ error?.message }</p>
-          </div>
-        </div>
-      ) }
-      { showResults && (
-        <>
-          <JsonResultView objectResult={ objectResult } />
-          <ExecutionTimeResult executionTime={ executionTime } />
-        </>
-      ) }
     </div>
   );
 }
