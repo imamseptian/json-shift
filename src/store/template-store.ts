@@ -1,70 +1,68 @@
 import { Template } from "@/schemas/template-schema";
-import { create, StateCreator } from "zustand";
-import { persist, PersistOptions } from "zustand/middleware";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
+// Constants
 const LOCAL_STORAGE_TEMPLATES_KEY = "templates-store";
 
-type StoreType = {
+// Types
+interface TemplateState {
   templates: Template[];
-  selectedTemplate: Template | null | undefined;
-  setSelectedTemplate: (template: Template | null | undefined) => void;
+  selectedTemplate: Template | null;
+}
+
+interface TemplateActions {
+  setSelectedTemplate: (template: Template | null) => void;
   addTemplate: (template: Template) => void;
   updateTemplate: (template: Template) => void;
-  deleteTemplate: (template: Template) => void;
+  deleteTemplate: (templateId: string) => void;
+}
+
+type TemplateStore = TemplateState & TemplateActions;
+
+// Helpers
+const stripIgnoreCache = (template: Template): Omit<Template, 'ignoreCache'> => {
+  const { ignoreCache, ...rest } = template;
+  return rest;
 };
 
-type PersistType = (
-  config: StateCreator<StoreType>,
-  options: PersistOptions<StoreType>
-) => StateCreator<StoreType>;
+const updateTimestamps = (template: Template, isNew = false): Template => ({
+  ...template,
+  updatedAt: new Date(),
+  ...(isNew && { createdAt: new Date() }),
+});
 
-const useTemplateStore = create<StoreType>(
-  (persist as PersistType)(
-    (set, get) => ({
-      templates           : [],
-      selectedTemplate    : null,
-      setSelectedTemplate : (template) => {
-        let selectedTemplate = null;
-        if (template) {
-          const { ignoreCache, ...restTemplate } = template || {};
-          selectedTemplate                       = { ...restTemplate };
-        }
+// Store
+export const useTemplateStore = create<TemplateStore>()(
+  persist(
+    (set) => ({
+      templates        : [],
+      selectedTemplate : null,
 
-        set({ selectedTemplate });
-      },
-      addTemplate: (template) => {
-        const { ignoreCache, ...restTemplate } = template;
+      setSelectedTemplate: (template) => set({ selectedTemplate: template ? stripIgnoreCache(template) : null }),
 
-        set((state) => ({
-          templates: [
-            ...state.templates,
-            { ...restTemplate, createdAt: new Date(), updatedAt: new Date() },
-          ],
-        }));
-      },
-      updateTemplate: (template) => {
-        const { ignoreCache, ...restTemplate } = template;
+      addTemplate: (template) => set((state) => ({
+        templates: [...state.templates, updateTimestamps(stripIgnoreCache(template), true)],
+      })),
 
-        set((state) => ({
-          templates: state.templates.map((t) => (t.id === restTemplate.id
-            ? { ...restTemplate, updatedAt: new Date() }
-            : t)),
-        }));
-      },
-      deleteTemplate: (template) => {
-        const { selectedTemplate } = get();
-        const isSelectedTemplate   = template.id === selectedTemplate?.id;
+      updateTemplate: (template) => set((state) => ({
+        templates: state.templates.map((t) => (t.id === template.id ? updateTimestamps(stripIgnoreCache(template)) : t)),
+      })),
 
-        set((state) => ({
-          templates        : state.templates.filter((t) => t.id !== template.id),
-          selectedTemplate : isSelectedTemplate ? null : selectedTemplate,
-        }));
-      },
+      deleteTemplate: (templateId) => set((state) => {
+        const newTemplates        = state.templates.filter((t) => t.id !== templateId);
+        const newSelectedTemplate = state.selectedTemplate?.id === templateId
+          ? null
+          : state.selectedTemplate;
+
+        return {
+          templates        : newTemplates,
+          selectedTemplate : newSelectedTemplate,
+        };
+      }),
     }),
     {
-      name: LOCAL_STORAGE_TEMPLATES_KEY, // unique name
+      name: LOCAL_STORAGE_TEMPLATES_KEY,
     },
   ),
 );
-
-export { useTemplateStore };

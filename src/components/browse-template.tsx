@@ -107,7 +107,7 @@ export default function BrowseTemplate() {
   };
 
   const handleDeleteClick = (template: Template) => {
-    deleteTemplate(template);
+    deleteTemplate(template.id!);
   };
 
   return (
