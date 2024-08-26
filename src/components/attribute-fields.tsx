@@ -14,6 +14,10 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 
+/**
+ * AttributeFields component for managing attribute fields in a template form
+ * @returns {JSX.Element} The rendered AttributeFields component
+ */
 export default function AttributeFields() {
   const { control, formState: { errors } } = useFormContext<Template>();
   const [openItems, setOpenItems]          = useState<string[]>([]);
@@ -46,44 +50,12 @@ export default function AttributeFields() {
         onValueChange={ setOpenItems }
       >
         { attributes.map((attribute, index) => (
-          <AccordionItem
+          <AttributeAccordionItem
             key={ `attribute-field-${index}` }
-            value={ `attribute-${index}` }
-            className="bg-secondary border-2 border-primary"
-          >
-            <AccordionTrigger
-              className="px-4 flex justify-between items-center bg-secondary text-secondary-foreground rounded-t-md w-full overflow-hidden"
-              onCloseClick={ () => remove(index) }
-            >
-              <h3 className="font-bold text-lg w-full text-start overflow-hidden">
-                { attribute.name || `Attribute ${index + 1}` }
-              </h3>
-              <span className="mx-5 capitalize hidden md:block">{ attribute.type }</span>
-            </AccordionTrigger>
-            <AccordionContent className="p-4 bg-muted text-muted-foreground">
-              <div className="flex gap-4 mb-5">
-                <InputField
-                  name={ `attributes.${index}.name` }
-                  label="Name"
-                  placeholder="Attribute name"
-                  className="basis-1/2"
-                />
-                <SelectField
-                  name={ `attributes.${index}.type` }
-                  label="Type"
-                  options={ TYPES }
-                  className="basis-1/2"
-                />
-              </div>
-
-              <TextareaField
-                name={ `attributes.${index}.description` }
-                label="Description"
-                placeholder="Attribute description"
-              />
-              <PropertiesField index={ index } />
-            </AccordionContent>
-          </AccordionItem>
+            attribute={ attribute }
+            index={ index }
+            remove={ remove }
+          />
         )) }
       </Accordion>
       <Button
@@ -101,5 +73,59 @@ export default function AttributeFields() {
         )
       }
     </div>
+  );
+}
+
+interface AttributeAccordionItemProps {
+  attribute: any;
+  index: number;
+  remove: (index: number) => void;
+}
+
+/**
+ * AttributeAccordionItem component for rendering individual attribute items
+ * @param {AttributeAccordionItemProps} props - The component props
+ * @returns {JSX.Element} The rendered AttributeAccordionItem component
+ */
+function AttributeAccordionItem({ attribute, index, remove }: AttributeAccordionItemProps): JSX.Element {
+  return (
+    <AccordionItem
+      key={ `attribute-field-${index}` }
+      value={ `attribute-${index}` }
+      className="bg-secondary border-2 border-primary"
+    >
+      <AccordionTrigger
+        className="px-4 flex justify-between items-center bg-secondary text-secondary-foreground rounded-t-md w-full overflow-hidden"
+        onCloseClick={ () => remove(index) }
+      >
+        <h3 className="font-bold text-lg w-full text-start overflow-hidden">
+          { attribute.name || `Attribute ${index + 1}` }
+        </h3>
+        <span className="mx-5 capitalize hidden md:block">{ attribute.type }</span>
+      </AccordionTrigger>
+      <AccordionContent className="p-4 bg-muted text-muted-foreground">
+        <div className="flex gap-4 mb-5">
+          <InputField
+            name={ `attributes.${index}.name` }
+            label="Name"
+            placeholder="Attribute name"
+            className="basis-1/2"
+          />
+          <SelectField
+            name={ `attributes.${index}.type` }
+            label="Type"
+            options={ TYPES }
+            className="basis-1/2"
+          />
+        </div>
+
+        <TextareaField
+          name={ `attributes.${index}.description` }
+          label="Description"
+          placeholder="Attribute description"
+        />
+        <PropertiesField index={ index } />
+      </AccordionContent>
+    </AccordionItem>
   );
 }
