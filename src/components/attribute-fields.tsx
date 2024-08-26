@@ -19,17 +19,18 @@ import {
  * @returns {JSX.Element} The rendered AttributeFields component
  */
 export default function AttributeFields() {
-  const { control, formState: { errors } } = useFormContext<Template>();
-  const [openItems, setOpenItems]          = useState<string[]>([]);
+  const { control, watch, formState: { errors } } = useFormContext<Template>();
+  const [openItems, setOpenItems]                 = useState<string[]>([]);
 
   const {
-    fields: attributes,
     remove,
     append,
   } = useFieldArray({
     control,
     name: `attributes`,
   });
+
+  const attributes = watch("attributes");
 
   const handleAddAttribute = () => {
     const newIndex = attributes.length;

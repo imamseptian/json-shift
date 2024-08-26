@@ -1,120 +1,76 @@
-import { Button } from "@/components/ui/button";
-import { ObjectAttribute, Template, TYPES } from "@/schemas/template-schema";
-import { PlusCircle } from "lucide-react";
-import { useState } from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
-import InputField from "./input-field";
-import SelectField from "./select-field";
-import TextareaField from "./text-area-field";
+import { Button } from '@/components/ui/button';
+import { ObjectAttribute, Template, TYPES } from '@/schemas/template-schema';
+import { PlusCircle } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
+import InputField from './input-field';
+import SelectField from './select-field';
+import TextareaField from './text-area-field';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from './ui/accordion';
 
-const PRIMITIVE_TYPES = TYPES.filter(
-  (type) => !["array", "object"].includes(type.value),
-);
+// Extracted constant
+const PRIMITIVE_TYPES = TYPES.filter((type) => !['array', 'object'].includes(type.value));
 
-export default function PropertyObjectField({
-  index,
-  isArray = false,
-}: {
+interface PropertyObjectFieldProps {
   index: number;
   isArray?: boolean;
-}) {
-  const { watch, control } = useFormContext<Template>();
+}
 
+/**
+ * PropertyObjectField component for managing object properties in a form.
+ * @param {PropertyObjectFieldProps} props - The component props
+ * @returns {React.ReactElement} The rendered component
+ */
+export default function PropertyObjectField({ index, isArray = false }: PropertyObjectFieldProps): React.ReactElement {
+  const { watch, control }                  = useFormContext<Template>();
   const [openProperties, setOpenProperties] = useState<string[]>([]);
 
-  const currentAttribute = watch(`attributes.${index}`);
-
+  const currentAttribute   = watch(`attributes.${index}`);
   const currentObjectField = watch(
     isArray ? `attributes.${index}.items` : `attributes.${index}`,
   ) as ObjectAttribute;
 
-  const { remove, append } = useFieldArray({
+  const { fields, remove, append } = useFieldArray({
     control,
-    name: isArray
-      ? `attributes.${index}.items.properties`
-      : `attributes.${index}.properties`,
+    name: isArray ? `attributes.${index}.items.properties` : `attributes.${index}.properties`,
   });
 
   const currentProperties = currentObjectField?.properties ?? [];
 
-  const handleAddPropertiesAttribute = () => {
-    const newIndex = currentProperties.length;
+  const handleAddPropertiesAttribute = useCallback(() => {
+    const newIndex = fields.length;
     append({
-      name        : "",
-      type        : "string",
-      description : "",
+      name        : '',
+      type        : 'string',
+      description : '',
     });
     setOpenProperties((prev) => [...prev, `property-field-${newIndex}`]);
-  };
+  }, [append, fields.length]);
 
   return (
     <div className="mt-5">
-      <h4 className="text-md font-semibold text-muted-foreground mb-5">
-        Object Properties
-      </h4>
+      <h4 className="text-md font-semibold text-muted-foreground mb-5">Object Properties</h4>
       <Accordion
         type="multiple"
         className="space-y-4"
         value={ openProperties }
         onValueChange={ setOpenProperties }
       >
-        { currentProperties.map((property, secondIndex) => (
-          <AccordionItem
-            value={ `property-field-${secondIndex}` }
-            className="bg-background border border-accent"
+        { currentProperties.map((field, secondIndex) => (
+          <PropertyAccordionItem
             key={ `property-field-${secondIndex}` }
-          >
-            <AccordionTrigger
-              className="px-4 flex justify-between items-center rounded-t-md"
-              onCloseClick={ () => remove(index) }
-            >
-              <h3 className="font-bold text-lg w-full text-start">
-                { property.name
-                  ? `${currentAttribute.name}.${property.name}`
-                  : `Object Property ${secondIndex + 1}` }
-              </h3>
-              <span className="mx-5 capitalize hidden md:block">{ property.type }</span>
-            </AccordionTrigger>
-            <AccordionContent className="p-4">
-              <div className="flex gap-4 mb-5">
-                <InputField
-                  name={
-                    isArray
-                      ? `attributes.${index}.items.properties.${secondIndex}.name`
-                      : `attributes.${index}.properties.${secondIndex}.name`
-                  }
-                  label="Name"
-                  placeholder="Attribute name"
-                  className="basis-1/2"
-                />
-                <SelectField
-                  name={
-                    isArray
-                      ? `attributes.${index}.items.properties.${secondIndex}.type`
-                      : `attributes.${index}.properties.${secondIndex}.type`
-                  }
-                  label="Type"
-                  options={ PRIMITIVE_TYPES }
-                  className="basis-1/2"
-                />
-              </div>
-              <TextareaField
-                name={
-                  isArray
-                    ? `attributes.${index}.items.properties.${secondIndex}.description`
-                    : `attributes.${index}.properties.${secondIndex}.description`
-                }
-                label="Description"
-                placeholder="Attribute description"
-              />
-            </AccordionContent>
-          </AccordionItem>
+            field={ field }
+            index={ secondIndex }
+            fieldNamePrefix={
+              isArray
+                ? `attributes.${index}.items.properties.${secondIndex}`
+                : `attributes.${index}.properties.${secondIndex}`
+            }
+            currentAttribute={ currentAttribute }
+            onRemove={ () => remove(secondIndex) }
+          />
         )) }
         <Button
           type="button"
@@ -127,5 +83,66 @@ export default function PropertyObjectField({
         </Button>
       </Accordion>
     </div>
+  );
+}
+
+interface PropertyAccordionItemProps {
+  field: Record<string, any>;
+  fieldNamePrefix: string;
+  index: number;
+  currentAttribute: any;
+  onRemove: () => void;
+}
+
+/**
+ * PropertyAccordionItem component for rendering individual property items.
+ * @param {PropertyAccordionItemProps} props - The component props
+ * @returns {React.ReactElement} The rendered component
+ */
+function PropertyAccordionItem({
+  field,
+  fieldNamePrefix,
+  currentAttribute,
+  index,
+  onRemove,
+}: PropertyAccordionItemProps): React.ReactElement {
+  return (
+    <AccordionItem
+      value={ `property-field-${index}` }
+      className="bg-background border border-accent"
+    >
+      <AccordionTrigger
+        className="px-4 flex justify-between items-center rounded-t-md"
+        onCloseClick={ onRemove }
+      >
+        <h3 className="font-bold text-lg w-full text-start">
+          { field.name
+            ? `${currentAttribute.name}.${field.name}`
+            : `Object Property ${index + 1}` }
+        </h3>
+        <span className="mx-5 capitalize hidden md:block">{ field.type }</span>
+      </AccordionTrigger>
+      <AccordionContent className="p-4">
+        <div className="flex gap-4 mb-5">
+          <InputField
+            name={ `${fieldNamePrefix}.name` }
+            label="Name"
+            placeholder="Attribute name"
+            className="basis-1/2"
+          />
+          <SelectField
+            name={ `${fieldNamePrefix}.type` }
+            label="Type"
+            options={ PRIMITIVE_TYPES }
+            className="basis-1/2"
+          />
+        </div>
+        <TextareaField
+          name={ `${fieldNamePrefix}.description` }
+          label="Description"
+          placeholder="Attribute description"
+        />
+      </AccordionContent>
+    </AccordionItem>
   );
 }

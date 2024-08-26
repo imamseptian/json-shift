@@ -24,6 +24,11 @@ interface TemplateListProps {
   onDeleteClick: (item: Template) => void;
 }
 
+/**
+ * TemplateList component for rendering a list of templates
+ * @param {TemplateListProps} props - The component props
+ * @returns {JSX.Element} The rendered TemplateList component
+ */
 function TemplateList({
   templates,
   onItemClick,
@@ -65,6 +70,10 @@ function TemplateList({
   );
 }
 
+/**
+ * BrowseTemplate component for browsing and selecting templates
+ * @returns {JSX.Element} The rendered BrowseTemplate component
+ */
 export default function BrowseTemplate() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterText, setFilterText]   = useState("");
