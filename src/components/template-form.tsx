@@ -16,9 +16,8 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-
 import { Template, TemplateSchema } from "@/schemas/template-schema";
-
+import { CircleAlert } from "lucide-react";
 import AttributeFields from "./attribute-fields";
 import InputField from "./input-field";
 import { Checkbox } from "./ui/checkbox";
@@ -30,33 +29,28 @@ const DEFAULT_TEMPLATE_VALUES: Template = {
   ignoreCache : false,
 };
 
-export default function TemplateForm(
-  {
-    template,
-    onFormSubmit,
-  }: {
-    template: Template | null | undefined,
-    onFormSubmit: (data: Template, form: UseFormReturn<Template>) => void
-  },
-) {
+interface TemplateFormProps {
+  template: Template | null | undefined;
+  onFormSubmit: (data: Template, form: UseFormReturn<Template>) => void;
+}
+
+/**
+ * TemplateForm component for creating and editing templates
+ * @param {TemplateFormProps} props - The component props
+ * @returns {JSX.Element} The rendered TemplateForm component
+ */
+export default function TemplateForm({ template, onFormSubmit }: TemplateFormProps): JSX.Element {
   const form = useForm<Template>({
     resolver      : zodResolver(TemplateSchema),
     defaultValues : DEFAULT_TEMPLATE_VALUES,
   });
 
   const {
-    reset,
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
+    reset, control, handleSubmit, formState: { isSubmitting },
   } = form;
 
   useEffect(() => {
-    if (template) {
-      reset(template);
-    } else {
-      reset(DEFAULT_TEMPLATE_VALUES);
-    }
+    reset(template || DEFAULT_TEMPLATE_VALUES);
   }, [template, reset]);
 
   const onSubmit = async (values: Template) => {
@@ -65,39 +59,9 @@ export default function TemplateForm(
 
   return (
     <Form { ...form }>
-      <form
-        onSubmit={ handleSubmit(onSubmit) }
-        className="space-y-6"
-      >
+      <form onSubmit={ handleSubmit(onSubmit) } className="space-y-6">
         <TemplateInfoCard />
-        <div className="flex p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
-          <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-          </svg>
-          <span className="sr-only">Info</span>
-          <div>
-            <span className="font-medium">Warning alert!</span>
-            { ' ' }
-            Due to LLM Token limitations per request that can cause a slow process or even an error response, Please note the following :
-            <ul className="list-disc list-outside mt-3">
-              <li>
-                <b>Processing Time:</b>
-                { ' ' }
-                It might take longer to process requests, especially if the targeted website has extensive content.
-              </li>
-              <li>
-                <b>Content Length:</b>
-                { ' ' }
-                Very long content from a website can cause difficulties in processing due to token limitations in the language model.
-              </li>
-              <li>
-                <b>Anti-Scraping Security:</b>
-                { ' ' }
-                Some websites have security measures that may prevent us from extracting information.
-              </li>
-            </ul>
-          </div>
-        </div>
+        <WarningAlert />
         <AttributesCard />
         <IgnoreCacheCheckbox control={ control } />
         <Button type="submit" className="w-full" disabled={ isSubmitting }>
@@ -108,7 +72,11 @@ export default function TemplateForm(
   );
 }
 
-function TemplateInfoCard() {
+/**
+ * TemplateInfoCard component for displaying template information fields
+ * @returns {JSX.Element} The rendered TemplateInfoCard component
+ */
+function TemplateInfoCard(): JSX.Element {
   return (
     <Card className="bg-card">
       <CardHeader className="pb-3">
@@ -124,7 +92,46 @@ function TemplateInfoCard() {
   );
 }
 
-function AttributesCard() {
+/**
+ * WarningAlert component for displaying important information to users
+ * @returns {JSX.Element} The rendered WarningAlert component
+ */
+function WarningAlert(): JSX.Element {
+  return (
+    <div className="flex p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+      <CircleAlert className="w-5 h-5 mr-2" />
+      <span className="sr-only">Info</span>
+      <div>
+        <span className="font-medium">Warning alert!</span>
+        { ' ' }
+        Due to LLM Token limitations per request that can cause a slow process or even an error response, Please note the following :
+        <ul className="list-disc list-outside mt-3">
+          <li>
+            <b>Processing Time:</b>
+            { ' ' }
+            It might take longer to process requests, especially if the targeted website has extensive content.
+          </li>
+          <li>
+            <b>Content Length:</b>
+            { ' ' }
+            Very long content from a website can cause difficulties in processing due to token limitations in the language model.
+          </li>
+          <li>
+            <b>Anti-Scraping Security:</b>
+            { ' ' }
+            Some websites have security measures that may prevent us from extracting information.
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * AttributesCard component for displaying attribute fields
+ * @returns {JSX.Element} The rendered AttributesCard component
+ */
+function AttributesCard(): JSX.Element {
   return (
     <Card className="bg-card">
       <CardHeader className="pb-3">
@@ -139,7 +146,13 @@ function AttributesCard() {
   );
 }
 
-function IgnoreCacheCheckbox({ control }: { control: any }) {
+/**
+ * IgnoreCacheCheckbox component for toggling cache usage
+ * @param {Object} props - The component props
+ * @param {any} props.control - The form control object
+ * @returns {JSX.Element} The rendered IgnoreCacheCheckbox component
+ */
+function IgnoreCacheCheckbox({ control }: { control: any }): JSX.Element {
   return (
     <FormField
       control={ control }
