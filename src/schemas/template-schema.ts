@@ -94,9 +94,47 @@ export const AttributeSchema = z.discriminatedUnion("type", [
   ArrayAttributeSchema,
 ]);
 
+const isInternalIP = (hostname: string): boolean => {
+  // Regular expressions for common private IP ranges and reserved IPs
+  const privateIPPatterns = [
+    /^10\./,                                // 10.0.0.0 – 10.255.255.255
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./,      // 172.16.0.0 – 172.31.255.255
+    /^192\.168\./,                          // 192.168.0.0 – 192.168.255.255
+    /^127\./,                               // Loopback address range (localhost)
+    /^169\.254\./,                          // Link-local addresses
+    /^::1$/,                                // IPv6 loopback address
+    /^fc00:/,                               // IPv6 unique local addresses
+    /^fe80:/,                                // IPv6 link-local addresses
+  ];
+
+  // Check for local and reserved hostnames
+  const reservedHostnames = [
+    'localhost',                            // Local development server
+    '127.0.0.1',                            // IPv4 loopback address
+    '::1',                                   // IPv6 loopback address
+  ];
+
+  // Test if hostname matches any reserved or private IP patterns
+  return privateIPPatterns.some((pattern) => pattern.test(hostname)) || reservedHostnames.includes(hostname);
+};
+
+const urlSchema = z.string().refine((url) => {
+  try {
+    const parsedUrl       = new URL(url);
+    const isValidProtocol = parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+    const isValidHostname = parsedUrl.hostname && !isInternalIP(parsedUrl.hostname);
+    return isValidProtocol && isValidHostname;
+    return false;
+  } catch {
+    return false;
+  }
+}, {
+  message: "Invalid URL. It must use HTTP or HTTPS protocol and have a valid, non-internal hostname.",
+});
+
 export const TemplateSchema = z.object({
   id           : z.string().optional(),
-  url          : z.string().url(),
+  url          : urlSchema,
   name         : z.string().min(1, "Cannot be empty"),
   attributes   : z.array(AttributeSchema).min(1, "Please input at least one attribute"),
   latestResult : z.any().optional(),
